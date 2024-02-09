@@ -1,0 +1,17 @@
+{
+  "name": "my-extension",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Harun Onur",
+  "license": "ISC",
+  "dependencies": {
+    "chrome-types": "^0.1.254"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}

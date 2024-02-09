@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "Harun's Extension",
+    "description": "Text Marker",
+    "version": "1.0",
+    "action": {
+      "default_popup": "/popup/popup.html",
+      "default_icon": "hello_extensions.png"
+    },
+    "permissions": [
+      "sidePanel", "activeTab", "tabs"
+    ],
+    "side_panel": {
+      "default_path": "/sidepanel/sidepanel.html"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "js": ["scripts/content.js"],
+        "matches": [
+          "http://*/*", 
+          "https://*/*"
+        ]
+      }
+    ]
+  }

@@ -13,3 +13,11 @@
 //         tabId: chrome.tabs.getCurrent()
 //     });
 // })
+
+document.addEventListener('DOMContentLoaded', function() {
+    var openSidePanelButton = document.getElementById('openSidePanel');
+    openSidePanelButton.addEventListener('click', function() {
+      chrome.runtime.sendMessage({ action: 'openSidePanel' });
+      window.close();
+    });
+  });

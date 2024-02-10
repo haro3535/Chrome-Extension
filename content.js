@@ -2,8 +2,12 @@
 // Cursor Mods: normal, marker
 let cursorMod = 'normal';
 
+let opacity = 0.5;
+let color = `rgba(255,212,101,${opacity})`;
+
 // TODO cant get messages
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    console.log('merhaba')
     if (message.action === 'changeCursor')
         cursorMod = message.cursorMod.toString();
   });
@@ -18,7 +22,7 @@ var selectedText = ""; // Variable to store selected text
 
         if (cursorMod == 'marker')
             selectedText = getSelectedText();
-        // clearHighlights();
+        //  clearHighlights();
     });
 
     // Event listener for mouse up
@@ -48,13 +52,15 @@ var selectedText = ""; // Variable to store selected text
     }
 
     // Function to highlight selected text
+    // TODO: It's working but not 100%
     function highlightSelectedText() {
         var selection = window.getSelection();
+        console.log(selection);
         if (selection.anchorNode === selection.focusNode) {
             var range = selection.getRangeAt(0);
             var span = document.createElement('span');
-            span.className = 'bg-yellow-200';
-            span.style.backgroundColor = 'yellow';
+            span.className = 'highlight';
+            span.style.backgroundColor = `${color}`;
             range.surroundContents(span);
         }
     }

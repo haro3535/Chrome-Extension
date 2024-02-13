@@ -2,6 +2,11 @@
     "manifest_version": 3,
     "name": "Harun's Extension",
     "description": "Text Marker",
+    "author": {
+      "name": "Harun Onur",
+      "email": "harunonur.ho@gmail.com",
+      "website": "https://www.harunonur.com/"
+    },
     "version": "1.0",
     "action": {
       "default_popup": "/popup/popup.html",
@@ -14,7 +19,8 @@
       "default_path": "/sidepanel/sidepanel.html"
     },
     "background": {
-      "service_worker": "background.js"
+      "service_worker": "background.js",
+      "type": "module"
     },
     "content_scripts": [
       {

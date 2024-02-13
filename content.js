@@ -5,14 +5,14 @@ let cursorMod = 'normal';
 let opacity = 0.5;
 let color = `rgba(255,212,101,${opacity})`;
 
-// TODO cant get messages
+
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     console.log('merhaba')
     if (message.action === 'changeCursor')
         cursorMod = message.cursorMod.toString();
   });
 
-var selectedText = ""; // Variable to store selected text
+let selectedText = ""; // Variable to store selected text
 
     // Event listener for mouse down
     document.addEventListener('mousedown', function(event) {
@@ -54,15 +54,29 @@ var selectedText = ""; // Variable to store selected text
     // Function to highlight selected text
     // TODO: It's working but not 100%
     function highlightSelectedText() {
-        var selection = window.getSelection();
-        console.log(selection);
+        let selection = window.getSelection();
+        checkForOverlap(selection)
         if (selection.anchorNode === selection.focusNode) {
             var range = selection.getRangeAt(0);
+            let anchorOffset = selection.anchorOffset
+            let focusOffset = selection.focusOffset
+
             var span = document.createElement('span');
             span.className = 'highlight';
             span.style.backgroundColor = `${color}`;
             range.surroundContents(span);
+
+            // Place the saving here!
+            saveHiglighting(span.parentElement, anchorOffset, focusOffset)
         }
+    }
+
+    // Checks for overlap of <span class="highlight">
+    function checkForOverlap(slc) {
+
+        console.log(slc)
+
+        return false;
     }
 
     // Function to clear highlights
@@ -77,5 +91,60 @@ var selectedText = ""; // Variable to store selected text
 
 
 
-  
+
+
+    // TODO: Store for each element's sibling number. (Which sibling it is)
+    function saveHiglighting(element, startOffset, endOffset) {
+
+        let spanObject = {
+            "startOffset": startOffset,
+            "endOffset": endOffset,
+            "style": {
+                "color": "yellow", // Default yellow
+                "opacity": 0.5, // Default 0.5
+            },
+            "elementPath": []
+        }
+
+        console.log(element.tagName)
+        let elementArray = []
+
+        while (element.tagName !== "BODY") {
+
+            let parent = element.parentElement;
+            let elementIndex = 0;
+
+            for (let index = 0; index < parent.childElementCount; index++) 
+                if (element === parent.childNodes.item(index)){
+                    elementIndex = index;
+                    break;
+                }
+
+            let parentObject = {
+                "tName": element.tagName,
+                "siblingNo": elementIndex
+            }
+
+            elementArray.push(parentObject)
+            element = element.parentElement
+        }
+
+        spanObject.elementPath.push(elementArray)
+        
+        console.log(spanObject)
+        
+        
+    }  
+
+
+
+    // This function will be used for append spans to html from db
+    function appendSpanElements(spanElement ,currentElement, anchorOffset, focusOffset){
+
+        let range = document.createRange();
+        range.setStart(currentElement, anchorOffset)
+        range.setEnd(currentElement, focusOffset)
+
+        range.surroundContents(spanElement)
+    }
 

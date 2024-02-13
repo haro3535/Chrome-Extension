@@ -20,3 +20,7 @@ document.getElementById('markingMod').addEventListener('click', () => {
         cursorMod: 'marker'
     });
 });
+
+document.getElementById("saveButton").addEventListener('click', () => {
+    
+})

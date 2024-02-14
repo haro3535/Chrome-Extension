@@ -8,8 +8,34 @@ let color = `rgba(255,212,101,${opacity})`;
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     console.log('merhaba')
-    if (message.action === 'changeCursor')
+    if (message.action === 'changeCursor'){
         cursorMod = message.cursorMod.toString();
+        if (cursorMod == "marker") {
+            // Burasi calismiyor 
+             let styleSheet = document.styleSheets[0]
+             let cssRule = `::selection { backgroun-color: yellow; color: inherit }`
+
+            styleSheet.insertRule(cssRule, 0); // Insert at index 0, you can choose another index or use -1 to append at the end
+              
+            // console.log(styleSheet)
+            // let cssRules = styleSheet.cssRules
+
+            // for (var i = 0; i < cssRules.length; i++) {
+            //     var rule = cssRules[i];
+            //     if (rule.selectorText === '::selection') {
+            //         // Modify the CSS rule
+            //         rule.style.backgroundColor = color; // Change background color to red
+            //         rule.style.color = 'inherit'
+            //         break; // Exit loop since we found the rule
+            //     }
+            // }
+        }
+        else document.styleSheets[0].deleteRule()
+    }
+    if (message.action === 'changeOpacity'){
+        opacity = message.opacityValue;
+        color = `rgba(255,212,101,${opacity})`
+    }
   });
 
 let selectedText = ""; // Variable to store selected text
@@ -55,7 +81,7 @@ let selectedText = ""; // Variable to store selected text
     // TODO: It's working but not 100%
     function highlightSelectedText() {
         let selection = window.getSelection();
-        checkForOverlap(selection)
+        // checkForOverlap(selection)
         if (selection.anchorNode === selection.focusNode) {
             var range = selection.getRangeAt(0);
             let anchorOffset = selection.anchorOffset
@@ -68,6 +94,7 @@ let selectedText = ""; // Variable to store selected text
 
             // Place the saving here!
             saveHiglighting(span.parentElement, anchorOffset, focusOffset)
+            window.getSelection().removeAllRanges()
         }
     }
 
@@ -139,7 +166,7 @@ let selectedText = ""; // Variable to store selected text
 
 
     // This function will be used for append spans to html from db
-    function appendSpanElements(spanElement ,currentElement, anchorOffset, focusOffset){
+    function appendSpanElements(spanElement , currentElement, anchorOffset, focusOffset){
 
         let range = document.createRange();
         range.setStart(currentElement, anchorOffset)

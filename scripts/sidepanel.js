@@ -3,8 +3,14 @@
 let opacitySpan = document.getElementById('opacityValueSpan');
 
 document.getElementById('opacityRange').addEventListener('input', (event) => {
-    console.log(event.target.value)
     opacitySpan.innerHTML = event.target.value / 100;
+})
+
+document.getElementById('opacityRange').addEventListener('change', (event) => {
+    chrome.runtime.sendMessage({ 
+        action: 'changeOpacity',
+        opacityValue: (event.target.value / 100)
+    })
 })
 
 document.getElementById('normalMod').addEventListener('click', () => {

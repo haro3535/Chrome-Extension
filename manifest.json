@@ -25,6 +25,7 @@
     "content_scripts": [
       {
         "js": ["content.js"],
+        "css": ["marker.css"],
         "matches": [
           "http://*/*", 
           "https://*/*"

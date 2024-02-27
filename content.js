@@ -12,10 +12,10 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         cursorMod = message.cursorMod.toString();
         if (cursorMod == "marker") {
             // Burasi calismiyor 
-             let styleSheet = document.styleSheets[0]
-             let cssRule = `::selection { backgroun-color: yellow; color: inherit }`
+            //  let styleSheet = document.styleSheets[0]
+            //  let cssRule = `::selection { backgroun-color: yellow; color: inherit }`
 
-            styleSheet.insertRule(cssRule, 0); // Insert at index 0, you can choose another index or use -1 to append at the end
+            // styleSheet.insertRule(cssRule, 0); // Insert at index 0, you can choose another index or use -1 to append at the end
               
             // console.log(styleSheet)
             // let cssRules = styleSheet.cssRules
@@ -47,7 +47,7 @@ let selectedText = ""; // Variable to store selected text
             return;
 
         if (cursorMod == 'marker')
-            selectedText = getSelectedText();
+            selectedText = getSelectedText(window.getSelection());
         //  clearHighlights();
     });
 
@@ -58,7 +58,17 @@ let selectedText = ""; // Variable to store selected text
             return;
 
         if (cursorMod == 'marker') {
-            selectedText = getSelectedText();
+            
+            // It returns if ancor and focus is same
+            let selection = window.getSelection();
+            console.log(selection.getRangeAt(0))
+
+            if (selection.isCollapsed)
+                return
+
+            myHighlightFunction()
+
+            selectedText = getSelectedText(selection);
             if (selectedText.trim() !== "" && selectedText != '') {
                 console.log("Selected text:", selectedText);
             }
@@ -68,9 +78,9 @@ let selectedText = ""; // Variable to store selected text
     });
 
     // Function to get selected text
-    function getSelectedText() {
+    function getSelectedText(selection) {
         var text = "";
-        var selection = window.getSelection();
+
         if (selection.anchorNode === selection.focusNode) {
             text = selection.toString();
         }
@@ -94,8 +104,8 @@ let selectedText = ""; // Variable to store selected text
 
             // Place the saving here!
             saveHiglighting(span.parentElement, anchorOffset, focusOffset)
-            window.getSelection().removeAllRanges()
         }
+        //window.getSelection().removeAllRanges()
     }
 
     // Checks for overlap of <span class="highlight">
@@ -173,5 +183,36 @@ let selectedText = ""; // Variable to store selected text
         range.setEnd(currentElement, focusOffset)
 
         range.surroundContents(spanElement)
+    }
+
+
+
+
+    function myHighlightFunction() {
+
+        let selection = window.getSelection();
+
+        let ancorNode = selection.anchorNode;
+        let anchorOffset = selection.anchorOffset;
+        let focusNode = selection.focusNode;
+        let focusOffset = selection.focusOffset;
+
+
+        if (ancorNode === focusNode){
+            highlightSelectedText();
+        }
+        else {
+            let commonAncestorContainer = selection.getRangeAt(0).commonAncestorContainer;
+            // TODO: Buradana devam tüm çocuk elementlere kadar ulaşıcan taki focuse nodu bulana kadar
+            let anchorParentNode = ancorNode.parentNode;
+            let focusParentNode = focusNode.parentNode;
+
+            let currentNode = anchorParentNode;
+            while (currentNode !== focusNode){
+                currentNode = currentNode.nextSibling;
+                console.log("abc")
+            }
+        }
+
     }
 

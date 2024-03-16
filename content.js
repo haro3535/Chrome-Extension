@@ -61,10 +61,10 @@ let selectedText = ""; // Variable to store selected text
             
             // It returns if ancor and focus is same
             let selection = window.getSelection();
-            console.log(selection.getRangeAt(0))
+            //console.log(selection.getRangeAt(0))
 
-            if (selection.isCollapsed)
-                return
+            // if (selection.isCollapsed)
+            //     return
 
             myHighlightFunction()
 
@@ -73,7 +73,7 @@ let selectedText = ""; // Variable to store selected text
                 console.log("Selected text:", selectedText);
             }
             selectedText = '';
-            highlightSelectedText();
+            // highlightSelectedText();
         }
     });
 
@@ -111,7 +111,7 @@ let selectedText = ""; // Variable to store selected text
     // Checks for overlap of <span class="highlight">
     function checkForOverlap(slc) {
 
-        console.log(slc)
+        //console.log(slc)
 
         return false;
     }
@@ -207,12 +207,141 @@ let selectedText = ""; // Variable to store selected text
             let anchorParentNode = ancorNode.parentNode;
             let focusParentNode = focusNode.parentNode;
 
-            let currentNode = anchorParentNode;
-            while (currentNode !== focusNode){
-                currentNode = currentNode.nextSibling;
-                console.log("abc")
+            console.log(ancorNode);
+            let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorParentNode);
+            let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusParentNode);
+            console.log("Starter Node: " + starterNodeIndex);
+            console.log("End Node: " + endNodeIndex);
+
+            if (starterNodeIndex < endNodeIndex){
+                let tIndex = starterNodeIndex + 1;
+                while (tIndex != endNodeIndex){
+                    traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                    tIndex++;
+                }
+                
+                elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l');
+                elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'r');
             }
+            else if (starterNodeIndex > endNodeIndex){
+                let tIndex = endNodeIndex + 1;
+                while (tIndex != starterNodeIndex){
+                    traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                    tIndex++;
+                }
+
+                
+                elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r');
+                elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'l');
+            }
+
+            
+
+            // commonAncestorContainer.childNodes.forEach(child => {
+            //     if (child.TEXT_NODE){
+            //         console.log("EVET");
+            //         console.log(child);
+            //     }
+            // })
+
+            // let currentNode = anchorParentNode;
+            // while (currentNode !== focusNode){
+            //     currentNode = currentNode.nextSibling;
+            //     console.log("abc")
+            // }
         }
 
+    }
+
+
+    function findSelectedChildofRootElement(commonAncestorContainer, node){
+
+        let currentElement = node;
+        while (currentElement.parentElement !== commonAncestorContainer){
+            currentElement = currentElement.parentElement;
+        }
+
+        return Array.prototype.indexOf.call(commonAncestorContainer.childNodes, currentElement);
+    }
+
+
+    // Travers through top to bottom (for the sibling parrent nodes that are between start parent node and end parent node)
+    function traversRootFromTopToBottom(node){
+
+
+        if (node.tagName == "P"){
+            console.log(node);
+            highlight(node, 0, (node.childNodes[0].length - 1));
+            return;
+        }
+        
+        if (node.hasChildNodes && node.nodeType !== Node.TEXT_NODE)
+            node.forEach(child => {
+                traversRootFromTopToBottom(child);
+            })
+        
+    }
+
+    function elevateBottomtoTop(node, targetNode, direction){
+
+        if (node === targetNode || node == null)
+            return;
+
+        let currentSibling = node;
+        while(node != null){
+            traversRootFromTopToBottom(currentSibling);
+            if(direction == 'l')
+                currentSibling = currentSibling.nextSibling;
+            else if (direction == 'r')
+                currentSibling = currentSibling.previousSibling;
+        }
+
+        if(direction == 'l'){
+            if(node.parentNode.nextSibling != null)
+                elevateBottomtoTop(node.parentNode.nextSibling, targetNode);
+            else elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node, targetNode, 'l'), targetNode);
+        }
+        else if (direction == 'r'){
+            if(node.parentNode.previousSibling != null)
+                elevateBottomtoTop(node.parentNode.nextSibling, targetNode);
+            else elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node, targetNode, 'r'), targetNode);
+        }
+        
+        
+            
+    }
+
+    function findUpperParentWhichIsHaveNotNullSibling(node, targetNode, direction){
+
+        if (node === targetNode)
+            return null;
+
+        if(direction == 'l'){
+            if (node.nextSibling != null)
+                return node.nextSibling;
+            
+            
+        }
+        else if (direction == 'r'){
+            if (node.previousSibling != null)
+                return node.previousSibling;
+        }
+
+        return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
+    }
+
+    // Highlites current node
+    function highlight(node, startOffset, endOffset){
+
+        console.log(startOffset, endOffset);
+
+        const range = document.createRange();
+        range.setStart(node, startOffset);
+        range.setEnd(node, endOffset);
+
+        var span = document.createElement('span');
+            span.className = 'highlight';
+            span.style.backgroundColor = `${color}`;
+        range.surroundContents(span);
     }
 

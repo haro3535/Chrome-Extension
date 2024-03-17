@@ -68,11 +68,13 @@ let selectedText = ""; // Variable to store selected text
 
             myHighlightFunction()
 
-            selectedText = getSelectedText(selection);
-            if (selectedText.trim() !== "" && selectedText != '') {
-                console.log("Selected text:", selectedText);
-            }
-            selectedText = '';
+            selection.removeAllRanges();
+
+            // selectedText = getSelectedText(selection);
+            // if (selectedText.trim() !== "" && selectedText != '') {
+            //     console.log("Selected text:", selectedText);
+            // }
+            // selectedText = '';
             // highlightSelectedText();
         }
     });
@@ -207,21 +209,25 @@ let selectedText = ""; // Variable to store selected text
             let anchorParentNode = ancorNode.parentNode;
             let focusParentNode = focusNode.parentNode;
 
-            console.log(ancorNode);
             let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorParentNode);
             let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusParentNode);
             console.log("Starter Node: " + starterNodeIndex);
             console.log("End Node: " + endNodeIndex);
 
             if (starterNodeIndex < endNodeIndex){
+                highlight(anchorParentNode,anchorOffset,anchorParentNode.firstChild.length);
+
                 let tIndex = starterNodeIndex + 1;
                 while (tIndex != endNodeIndex){
                     traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                    console.log("Buraya geldimmm");
                     tIndex++;
                 }
                 
                 elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l');
                 elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'r');
+
+                highlight(focusParentNode,0,focusOffset);
             }
             else if (starterNodeIndex > endNodeIndex){
                 let tIndex = endNodeIndex + 1;
@@ -229,28 +235,11 @@ let selectedText = ""; // Variable to store selected text
                     traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
                     tIndex++;
                 }
-
                 
                 elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r');
                 elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'l');
             }
-
-            
-
-            // commonAncestorContainer.childNodes.forEach(child => {
-            //     if (child.TEXT_NODE){
-            //         console.log("EVET");
-            //         console.log(child);
-            //     }
-            // })
-
-            // let currentNode = anchorParentNode;
-            // while (currentNode !== focusNode){
-            //     currentNode = currentNode.nextSibling;
-            //     console.log("abc")
-            // }
         }
-
     }
 
 
@@ -266,78 +255,94 @@ let selectedText = ""; // Variable to store selected text
 
 
     // Travers through top to bottom (for the sibling parrent nodes that are between start parent node and end parent node)
+    /**
+     * @param {Node} node
+     */
     function traversRootFromTopToBottom(node){
 
+        if (node == null)
+            return;
+
+        //console.log("Node Type: " + node);
 
         if (node.tagName == "P"){
-            console.log(node);
-            highlight(node, 0, (node.childNodes[0].length - 1));
+            console.log(node.childNodes[0]);
+            highlight(node, 0, node.childNodes[0].length);
             return;
         }
         
-        if (node.hasChildNodes && node.nodeType !== Node.TEXT_NODE)
+        if (node.hasChildNodes() && node.nodeType !== Node.TEXT_NODE)
+        {
+            console.log("Node Type: " + node);
+            console.log("Has Child: " + node.hasChildNodes());
+            console.log("Childs" + node.childNodes.length);
             node.forEach(child => {
                 traversRootFromTopToBottom(child);
             })
-        
+        }
     }
 
+    /**
+     * @param {Node} node
+     * @param {Node} targetNode 
+     * @param {*} direction
+     */
     function elevateBottomtoTop(node, targetNode, direction){
 
-        if (node === targetNode || node == null)
-            return;
+        if (node === targetNode || node === null)
+            return null;
 
+
+        // Yukari dogru gitmeden once verilen dogrultuda kardeslerini tariyor
         let currentSibling = node;
-        while(node != null){
-            traversRootFromTopToBottom(currentSibling);
+        while(currentSibling != null){
             if(direction == 'l')
                 currentSibling = currentSibling.nextSibling;
             else if (direction == 'r')
                 currentSibling = currentSibling.previousSibling;
+            traversRootFromTopToBottom(currentSibling);
         }
 
-        if(direction == 'l'){
-            if(node.parentNode.nextSibling != null)
-                elevateBottomtoTop(node.parentNode.nextSibling, targetNode);
-            else elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node, targetNode, 'l'), targetNode);
-        }
-        else if (direction == 'r'){
-            if(node.parentNode.previousSibling != null)
-                elevateBottomtoTop(node.parentNode.nextSibling, targetNode);
-            else elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node, targetNode, 'r'), targetNode);
-        }
-        
-        
-            
+        elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction);
+             
     }
 
+    /**
+     * @param {Node} node
+     * @param {Node} targetNode 
+     * @param {*} direction
+     */
     function findUpperParentWhichIsHaveNotNullSibling(node, targetNode, direction){
 
-        if (node === targetNode)
-            return null;
 
-        if(direction == 'l'){
+        if (node === targetNode)
+            return targetNode;
+        
+        if(direction == 'l')
             if (node.nextSibling != null)
                 return node.nextSibling;
-            
-            
-        }
-        else if (direction == 'r'){
+        else if (direction == 'r')
             if (node.previousSibling != null)
                 return node.previousSibling;
-        }
 
         return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
     }
 
     // Highlites current node
+    /**
+     * @param {Node} node
+     * @param {number} startOffset 
+     * @param {number} endOffset
+     */
     function highlight(node, startOffset, endOffset){
 
         console.log(startOffset, endOffset);
 
         const range = document.createRange();
-        range.setStart(node, startOffset);
-        range.setEnd(node, endOffset);
+        range.setStart(node.firstChild, startOffset);
+        range.setEnd(node.firstChild, endOffset);
+
+        console.log(range);
 
         var span = document.createElement('span');
             span.className = 'highlight';

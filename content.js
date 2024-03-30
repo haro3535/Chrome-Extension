@@ -205,17 +205,18 @@ let selectedText = ""; // Variable to store selected text
         }
         else {
             let commonAncestorContainer = selection.getRangeAt(0).commonAncestorContainer;
+            console.log(commonAncestorContainer);
             // TODO: Buradana devam tüm çocuk elementlere kadar ulaşıcan taki focuse nodu bulana kadar
             let anchorParentNode = ancorNode.parentNode;
             let focusParentNode = focusNode.parentNode;
 
-            let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorParentNode);
-            let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusParentNode);
+            let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, ancorNode);
+            let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
             console.log("Starter Node: " + starterNodeIndex);
             console.log("End Node: " + endNodeIndex);
 
             if (starterNodeIndex < endNodeIndex){
-                highlight(anchorParentNode,anchorOffset,anchorParentNode.firstChild.length);
+                highlight(ancorNode,anchorOffset,ancorNode.length);
 
                 let tIndex = starterNodeIndex + 1;
                 while (tIndex != endNodeIndex){
@@ -224,10 +225,13 @@ let selectedText = ""; // Variable to store selected text
                     tIndex++;
                 }
                 
+                debugger;
+                
+                // TODO: Problem in here
                 elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l');
                 elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'r');
 
-                highlight(focusParentNode,0,focusOffset);
+                //highlight(focusNode,0,focusOffset);
             }
             else if (starterNodeIndex > endNodeIndex){
                 let tIndex = endNodeIndex + 1;
@@ -242,9 +246,13 @@ let selectedText = ""; // Variable to store selected text
         }
     }
 
-
+    /**
+     * @param {Node} commonAncestorContainer
+     * @param {Node} node
+     */
     function findSelectedChildofRootElement(commonAncestorContainer, node){
 
+        
         let currentElement = node;
         while (currentElement.parentElement !== commonAncestorContainer){
             currentElement = currentElement.parentElement;
@@ -265,9 +273,9 @@ let selectedText = ""; // Variable to store selected text
 
         //console.log("Node Type: " + node);
 
-        if (node.tagName == "P"){
-            console.log(node.childNodes[0]);
-            highlight(node, 0, node.childNodes[0].length);
+        if (node.nodeType === Node.TEXT_NODE){
+            console.log(node);
+            highlight(node, 0, node.length);
             return;
         }
         
@@ -276,7 +284,7 @@ let selectedText = ""; // Variable to store selected text
             console.log("Node Type: " + node);
             console.log("Has Child: " + node.hasChildNodes());
             console.log("Childs" + node.childNodes.length);
-            node.forEach(child => {
+            node.childNodes.forEach(child => {
                 traversRootFromTopToBottom(child);
             })
         }
@@ -339,8 +347,8 @@ let selectedText = ""; // Variable to store selected text
         console.log(startOffset, endOffset);
 
         const range = document.createRange();
-        range.setStart(node.firstChild, startOffset);
-        range.setEnd(node.firstChild, endOffset);
+        range.setStart(node, startOffset);
+        range.setEnd(node, endOffset);
 
         console.log(range);
 
@@ -348,5 +356,7 @@ let selectedText = ""; // Variable to store selected text
             span.className = 'highlight';
             span.style.backgroundColor = `${color}`;
         range.surroundContents(span);
+
+        window.getSelection().removeAllRanges();
     }
 

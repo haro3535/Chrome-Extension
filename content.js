@@ -5,6 +5,8 @@ let cursorMod = 'normal';
 let opacity = 0.5;
 let color = `rgba(255,212,101,${opacity})`;
 
+let style = null;
+
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     console.log('merhaba')
@@ -12,25 +14,21 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         cursorMod = message.cursorMod.toString();
         if (cursorMod == "marker") {
             // Burasi calismiyor 
-            //  let styleSheet = document.styleSheets[0]
-            //  let cssRule = `::selection { backgroun-color: yellow; color: inherit }`
-
-            // styleSheet.insertRule(cssRule, 0); // Insert at index 0, you can choose another index or use -1 to append at the end
-              
-            // console.log(styleSheet)
-            // let cssRules = styleSheet.cssRules
-
-            // for (var i = 0; i < cssRules.length; i++) {
-            //     var rule = cssRules[i];
-            //     if (rule.selectorText === '::selection') {
-            //         // Modify the CSS rule
-            //         rule.style.backgroundColor = color; // Change background color to red
-            //         rule.style.color = 'inherit'
-            //         break; // Exit loop since we found the rule
-            //     }
-            // }
+            style = document.createElement('style');
+            style.innerHTML = `
+                ::selection {
+                    background-color: ${color};
+                }
+                ::-moz-selection {
+                    background-color: ${color};
+                }
+            `;
+            document.head.appendChild(style);
+            
         }
-        else document.styleSheets[0].deleteRule()
+        else 
+            if(style != null)
+                document.head.removeChild(style);
     }
     if (message.action === 'changeOpacity'){
         opacity = message.opacityValue;
@@ -216,7 +214,6 @@ let selectedText = ""; // Variable to store selected text
             console.log("End Node: " + endNodeIndex);
 
             if (starterNodeIndex < endNodeIndex){
-                highlight(ancorNode,anchorOffset,ancorNode.length);
 
                 let tIndex = starterNodeIndex + 1;
                 while (tIndex != endNodeIndex){
@@ -225,13 +222,12 @@ let selectedText = ""; // Variable to store selected text
                     tIndex++;
                 }
                 
-                debugger;
+                highlight(ancorNode,anchorOffset,ancorNode.length);
+        
+                horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', ancorNode);
+                horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'r', focusNode);
                 
-                // TODO: Problem in here
-                elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l');
-                elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'r');
-
-                //highlight(focusNode,0,focusOffset);
+                highlight(focusNode,0,focusOffset);
             }
             else if (starterNodeIndex > endNodeIndex){
                 let tIndex = endNodeIndex + 1;
@@ -239,9 +235,13 @@ let selectedText = ""; // Variable to store selected text
                     traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
                     tIndex++;
                 }
+
+                //highlight(ancorNode,anchorOffset,ancorNode.length);
+
+                horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', ancorNode);
+                horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'l', focusNode);
                 
-                elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r');
-                elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'l');
+                //highlight(focusNode,0,focusOffset);
             }
         }
     }
@@ -273,7 +273,7 @@ let selectedText = ""; // Variable to store selected text
 
         //console.log("Node Type: " + node);
 
-        if (node.nodeType === Node.TEXT_NODE){
+        if (node.nodeType === Node.TEXT_NODE && node.nodeValue != ""){
             console.log(node);
             highlight(node, 0, node.length);
             return;
@@ -284,6 +284,12 @@ let selectedText = ""; // Variable to store selected text
             console.log("Node Type: " + node);
             console.log("Has Child: " + node.hasChildNodes());
             console.log("Childs" + node.childNodes.length);
+
+            let childNumber = node.childNodes.length;
+
+            if (childNumber == 1)
+                traversRootFromTopToBottom(node.childNodes[0]);
+            else if (childNumber > 1)
             node.childNodes.forEach(child => {
                 traversRootFromTopToBottom(child);
             })
@@ -296,6 +302,8 @@ let selectedText = ""; // Variable to store selected text
      * @param {*} direction
      */
     function elevateBottomtoTop(node, targetNode, direction){
+
+        
 
         if (node === targetNode || node === null)
             return null;
@@ -313,6 +321,47 @@ let selectedText = ""; // Variable to store selected text
 
         elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction);
              
+    }
+
+    /**
+     * @param {Node} node
+     * @param {Node} targetNode 
+     * @param {*} direction
+     * @param {Node} startEnd
+     */
+    function horizontalStepFunction(node, targetNode, direction, startEnd){
+
+        if (node === targetNode)
+            return;
+
+        if (direction == 'l'){
+            
+            // Burada next sibling null ise sıkıntı çıkmasın diye yapıyorum
+            let nextSibling = node.nextSibling;
+            if (nextSibling != null){
+                if(node != startEnd)
+                    traversRootFromTopToBottom(nextSibling);
+                horizontalStepFunction(nextSibling, targetNode, direction, null);
+            }
+            else 
+                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, null);
+        }
+        else if (direction == 'r'){
+            // Burada previous sibling null ise sıkıntı çıkmasın diye yapıyorum
+            let prevSibling = node.previousSibling;
+            if (prevSibling != null){
+                if(node != startEnd)
+                    traversRootFromTopToBottom(prevSibling);
+                horizontalStepFunction(prevSibling, targetNode, direction, null);
+            }
+            else 
+                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, null);
+        }
+        else 
+        {
+            console.error("Incorrect directon value: " + direction);
+            return;
+        }
     }
 
     /**

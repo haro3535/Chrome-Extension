@@ -9,32 +9,51 @@ let style = null;
 
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    console.log('merhaba')
     if (message.action === 'changeCursor'){
         cursorMod = message.cursorMod.toString();
         if (cursorMod == "marker") {
             // Burasi calismiyor 
-            style = document.createElement('style');
-            style.innerHTML = `
-                ::selection {
-                    background-color: ${color};
-                }
-                ::-moz-selection {
-                    background-color: ${color};
-                }
-            `;
-            document.head.appendChild(style);
+            console.log("marker");
+            appendStyle();
             
         }
-        else 
+        else {
+            console.log("cursor");
             if(style != null)
+            {
+                
                 document.head.removeChild(style);
+                style = null;
+            }
+        }
+                
     }
     if (message.action === 'changeOpacity'){
         opacity = message.opacityValue;
         color = `rgba(255,212,101,${opacity})`
     }
   });
+
+
+function appendStyle(){
+    if (style == null){
+        style = document.createElement('style');
+        style.innerHTML = `
+            ::selection {
+                background-color: ${color};
+            }
+            ::-moz-selection {
+                background-color: ${color};
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    else{
+        document.head.removeChild(style);
+        style = null;
+        appendStyle();
+    }
+}
 
 let selectedText = ""; // Variable to store selected text
 
@@ -68,12 +87,6 @@ let selectedText = ""; // Variable to store selected text
 
             selection.removeAllRanges();
 
-            // selectedText = getSelectedText(selection);
-            // if (selectedText.trim() !== "" && selectedText != '') {
-            //     console.log("Selected text:", selectedText);
-            // }
-            // selectedText = '';
-            // highlightSelectedText();
         }
     });
 
@@ -125,55 +138,6 @@ let selectedText = ""; // Variable to store selected text
     //         parent.normalize();
     //     });
     // }
-
-
-
-
-
-    // TODO: Store for each element's sibling number. (Which sibling it is)
-    function saveHiglighting(element, startOffset, endOffset) {
-
-        let spanObject = {
-            "startOffset": startOffset,
-            "endOffset": endOffset,
-            "style": {
-                "color": "yellow", // Default yellow
-                "opacity": 0.5, // Default 0.5
-            },
-            "elementPath": []
-        }
-
-        console.log(element.tagName)
-        let elementArray = []
-
-        while (element.tagName !== "BODY") {
-
-            let parent = element.parentElement;
-            let elementIndex = 0;
-
-            for (let index = 0; index < parent.childElementCount; index++) 
-                if (element === parent.childNodes.item(index)){
-                    elementIndex = index;
-                    break;
-                }
-
-            let parentObject = {
-                "tName": element.tagName,
-                "siblingNo": elementIndex
-            }
-
-            elementArray.push(parentObject)
-            element = element.parentElement
-        }
-
-        spanObject.elementPath.push(elementArray)
-        
-        console.log(spanObject)
-        
-        
-    }  
-
-
 
     // This function will be used for append spans to html from db
     function appendSpanElements(spanElement , currentElement, anchorOffset, focusOffset){
@@ -408,4 +372,59 @@ let selectedText = ""; // Variable to store selected text
 
         window.getSelection().removeAllRanges();
     }
+
+
+
+
+
+
+
+
+/**
+     * @param {Node} element
+     * @param {number} startOffset 
+     * @param {number} endOffset
+     */
+// TODO: Store for each element's sibling number. (Which sibling it is)
+function saveHiglighting(element, startOffset, endOffset) {
+
+    let spanObject = {
+        "startOffset": startOffset,
+        "endOffset": endOffset,
+        "style": {
+            "color": "yellow", // Default yellow
+            "opacity": 0.5, // Default 0.5
+        },
+        "elementPath": []
+    }
+
+    console.log(element.tagName)
+    let elementArray = []
+
+    while (element.tagName !== "BODY") {
+
+        let parent = element.parentElement;
+        let elementIndex = 0;
+
+        for (let index = 0; index < parent.childElementCount; index++) 
+            if (element === parent.childNodes.item(index)){
+                elementIndex = index;
+                break;
+            }
+
+        let parentObject = {
+            "tName": element.tagName,
+            "siblingNo": elementIndex
+        }
+
+        elementArray.push(parentObject)
+        element = element.parentElement
+    }
+
+    spanObject.elementPath.push(elementArray)
+    
+    console.log(spanObject)
+    
+    
+}  
 

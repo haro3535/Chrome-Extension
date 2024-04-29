@@ -5,38 +5,55 @@ let cursorMod = 'normal';
 let opacity = 0.5;
 let color = `rgba(255,212,101,${opacity})`;
 
+let style = null;
+
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    console.log('merhaba')
     if (message.action === 'changeCursor'){
         cursorMod = message.cursorMod.toString();
         if (cursorMod == "marker") {
             // Burasi calismiyor 
-            //  let styleSheet = document.styleSheets[0]
-            //  let cssRule = `::selection { backgroun-color: yellow; color: inherit }`
-
-            // styleSheet.insertRule(cssRule, 0); // Insert at index 0, you can choose another index or use -1 to append at the end
-              
-            // console.log(styleSheet)
-            // let cssRules = styleSheet.cssRules
-
-            // for (var i = 0; i < cssRules.length; i++) {
-            //     var rule = cssRules[i];
-            //     if (rule.selectorText === '::selection') {
-            //         // Modify the CSS rule
-            //         rule.style.backgroundColor = color; // Change background color to red
-            //         rule.style.color = 'inherit'
-            //         break; // Exit loop since we found the rule
-            //     }
-            // }
+            console.log("marker");
+            appendStyle();
+            
         }
-        else document.styleSheets[0].deleteRule()
+        else {
+            console.log("cursor");
+            if(style != null)
+            {
+                
+                document.head.removeChild(style);
+                style = null;
+            }
+        }
+                
     }
     if (message.action === 'changeOpacity'){
         opacity = message.opacityValue;
         color = `rgba(255,212,101,${opacity})`
     }
   });
+
+
+function appendStyle(){
+    if (style == null){
+        style = document.createElement('style');
+        style.innerHTML = `
+            ::selection {
+                background-color: ${color};
+            }
+            ::-moz-selection {
+                background-color: ${color};
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    else{
+        document.head.removeChild(style);
+        style = null;
+        appendStyle();
+    }
+}
 
 let selectedText = ""; // Variable to store selected text
 
@@ -70,12 +87,6 @@ let selectedText = ""; // Variable to store selected text
 
             selection.removeAllRanges();
 
-            // selectedText = getSelectedText(selection);
-            // if (selectedText.trim() !== "" && selectedText != '') {
-            //     console.log("Selected text:", selectedText);
-            // }
-            // selectedText = '';
-            // highlightSelectedText();
         }
     });
 
@@ -128,55 +139,6 @@ let selectedText = ""; // Variable to store selected text
     //     });
     // }
 
-
-
-
-
-    // TODO: Store for each element's sibling number. (Which sibling it is)
-    function saveHiglighting(element, startOffset, endOffset) {
-
-        let spanObject = {
-            "startOffset": startOffset,
-            "endOffset": endOffset,
-            "style": {
-                "color": "yellow", // Default yellow
-                "opacity": 0.5, // Default 0.5
-            },
-            "elementPath": []
-        }
-
-        console.log(element.tagName)
-        let elementArray = []
-
-        while (element.tagName !== "BODY") {
-
-            let parent = element.parentElement;
-            let elementIndex = 0;
-
-            for (let index = 0; index < parent.childElementCount; index++) 
-                if (element === parent.childNodes.item(index)){
-                    elementIndex = index;
-                    break;
-                }
-
-            let parentObject = {
-                "tName": element.tagName,
-                "siblingNo": elementIndex
-            }
-
-            elementArray.push(parentObject)
-            element = element.parentElement
-        }
-
-        spanObject.elementPath.push(elementArray)
-        
-        console.log(spanObject)
-        
-        
-    }  
-
-
-
     // This function will be used for append spans to html from db
     function appendSpanElements(spanElement , currentElement, anchorOffset, focusOffset){
 
@@ -205,17 +167,17 @@ let selectedText = ""; // Variable to store selected text
         }
         else {
             let commonAncestorContainer = selection.getRangeAt(0).commonAncestorContainer;
+            console.log(commonAncestorContainer);
             // TODO: Buradana devam tüm çocuk elementlere kadar ulaşıcan taki focuse nodu bulana kadar
             let anchorParentNode = ancorNode.parentNode;
             let focusParentNode = focusNode.parentNode;
 
-            let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorParentNode);
-            let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusParentNode);
+            let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, ancorNode);
+            let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
             console.log("Starter Node: " + starterNodeIndex);
             console.log("End Node: " + endNodeIndex);
 
             if (starterNodeIndex < endNodeIndex){
-                highlight(anchorParentNode,anchorOffset,anchorParentNode.firstChild.length);
 
                 let tIndex = starterNodeIndex + 1;
                 while (tIndex != endNodeIndex){
@@ -224,10 +186,12 @@ let selectedText = ""; // Variable to store selected text
                     tIndex++;
                 }
                 
-                elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l');
-                elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'r');
-
-                highlight(focusParentNode,0,focusOffset);
+                highlight(ancorNode,anchorOffset,ancorNode.length);
+        
+                horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', ancorNode);
+                horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'r', focusNode);
+                
+                highlight(focusNode,0,focusOffset);
             }
             else if (starterNodeIndex > endNodeIndex){
                 let tIndex = endNodeIndex + 1;
@@ -235,16 +199,24 @@ let selectedText = ""; // Variable to store selected text
                     traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
                     tIndex++;
                 }
+
+                //highlight(ancorNode,anchorOffset,ancorNode.length);
+
+                horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', ancorNode);
+                horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'l', focusNode);
                 
-                elevateBottomtoTop(anchorParentNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r');
-                elevateBottomtoTop(focusParentNode, commonAncestorContainer.childNodes[endNodeIndex], 'l');
+                //highlight(focusNode,0,focusOffset);
             }
         }
     }
 
-
+    /**
+     * @param {Node} commonAncestorContainer
+     * @param {Node} node
+     */
     function findSelectedChildofRootElement(commonAncestorContainer, node){
 
+        
         let currentElement = node;
         while (currentElement.parentElement !== commonAncestorContainer){
             currentElement = currentElement.parentElement;
@@ -265,9 +237,9 @@ let selectedText = ""; // Variable to store selected text
 
         //console.log("Node Type: " + node);
 
-        if (node.tagName == "P"){
-            console.log(node.childNodes[0]);
-            highlight(node, 0, node.childNodes[0].length);
+        if (node.nodeType === Node.TEXT_NODE && node.nodeValue != ""){
+            console.log(node);
+            highlight(node, 0, node.length);
             return;
         }
         
@@ -276,7 +248,13 @@ let selectedText = ""; // Variable to store selected text
             console.log("Node Type: " + node);
             console.log("Has Child: " + node.hasChildNodes());
             console.log("Childs" + node.childNodes.length);
-            node.forEach(child => {
+
+            let childNumber = node.childNodes.length;
+
+            if (childNumber == 1)
+                traversRootFromTopToBottom(node.childNodes[0]);
+            else if (childNumber > 1)
+            node.childNodes.forEach(child => {
                 traversRootFromTopToBottom(child);
             })
         }
@@ -288,6 +266,8 @@ let selectedText = ""; // Variable to store selected text
      * @param {*} direction
      */
     function elevateBottomtoTop(node, targetNode, direction){
+
+        
 
         if (node === targetNode || node === null)
             return null;
@@ -305,6 +285,47 @@ let selectedText = ""; // Variable to store selected text
 
         elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction);
              
+    }
+
+    /**
+     * @param {Node} node
+     * @param {Node} targetNode 
+     * @param {*} direction
+     * @param {Node} startEnd
+     */
+    function horizontalStepFunction(node, targetNode, direction, startEnd){
+
+        if (node === targetNode)
+            return;
+
+        if (direction == 'l'){
+            
+            // Burada next sibling null ise sıkıntı çıkmasın diye yapıyorum
+            let nextSibling = node.nextSibling;
+            if (nextSibling != null){
+                if(node != startEnd)
+                    traversRootFromTopToBottom(nextSibling);
+                horizontalStepFunction(nextSibling, targetNode, direction, null);
+            }
+            else 
+                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, null);
+        }
+        else if (direction == 'r'){
+            // Burada previous sibling null ise sıkıntı çıkmasın diye yapıyorum
+            let prevSibling = node.previousSibling;
+            if (prevSibling != null){
+                if(node != startEnd)
+                    traversRootFromTopToBottom(prevSibling);
+                horizontalStepFunction(prevSibling, targetNode, direction, null);
+            }
+            else 
+                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, null);
+        }
+        else 
+        {
+            console.error("Incorrect directon value: " + direction);
+            return;
+        }
     }
 
     /**
@@ -339,8 +360,8 @@ let selectedText = ""; // Variable to store selected text
         console.log(startOffset, endOffset);
 
         const range = document.createRange();
-        range.setStart(node.firstChild, startOffset);
-        range.setEnd(node.firstChild, endOffset);
+        range.setStart(node, startOffset);
+        range.setEnd(node, endOffset);
 
         console.log(range);
 
@@ -348,5 +369,62 @@ let selectedText = ""; // Variable to store selected text
             span.className = 'highlight';
             span.style.backgroundColor = `${color}`;
         range.surroundContents(span);
+
+        window.getSelection().removeAllRanges();
     }
+
+
+
+
+
+
+
+
+/**
+     * @param {Node} element
+     * @param {number} startOffset 
+     * @param {number} endOffset
+     */
+// TODO: Store for each element's sibling number. (Which sibling it is)
+function saveHiglighting(element, startOffset, endOffset) {
+
+    let spanObject = {
+        "startOffset": startOffset,
+        "endOffset": endOffset,
+        "style": {
+            "color": "yellow", // Default yellow
+            "opacity": 0.5, // Default 0.5
+        },
+        "elementPath": []
+    }
+
+    console.log(element.tagName)
+    let elementArray = []
+
+    while (element.tagName !== "BODY") {
+
+        let parent = element.parentElement;
+        let elementIndex = 0;
+
+        for (let index = 0; index < parent.childElementCount; index++) 
+            if (element === parent.childNodes.item(index)){
+                elementIndex = index;
+                break;
+            }
+
+        let parentObject = {
+            "tName": element.tagName,
+            "siblingNo": elementIndex
+        }
+
+        elementArray.push(parentObject)
+        element = element.parentElement
+    }
+
+    spanObject.elementPath.push(elementArray)
+    
+    console.log(spanObject)
+    
+    
+}  
 

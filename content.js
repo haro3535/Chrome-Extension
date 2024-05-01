@@ -2,7 +2,8 @@
 // Cursor Mods: normal, marker
 let cursorMod = 'normal';
 
-let color = `rgba(255,212,101,0.8)`;
+let alpha = 0.8
+let color = `rgba(255,212,101,${alpha})`;
 
 let style = null;
 
@@ -24,11 +25,18 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
                 document.head.removeChild(style);
                 style = null;
             }
-        }
-                
+        }      
     }
-    if (message.action === 'changeOpacity'){
-        color = `rgba(255,212,101,${message.opacityValue})`;
+    else if (message.action === 'changeOpacity'){
+        alpha = message.opacityValue;
+        let rgbComponents = color.match(/\d+/g);
+        color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
+        appendStyle();
+    }
+    else if (message.action === 'changeColor'){
+        console.log(message.color);
+        let rgbComponents = message.color.match(/\d+/g);
+        color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
         appendStyle();
     }
   });

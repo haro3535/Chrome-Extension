@@ -30,3 +30,20 @@ document.getElementById('markingMod').addEventListener('click', () => {
 document.getElementById("saveButton").addEventListener('click', () => {
     
 })
+
+const colorCells = document.getElementsByClassName("colorcell");
+
+for (let index = 0; index < colorCells.length; index++) {
+    colorCells[index].addEventListener("click", (event) => {
+        //console.log("Clicked! " + getComputedStyle(colorCells[index]).backgroundColor);
+        chrome.runtime.sendMessage({
+            action: 'changeColor',
+            color: `${getComputedStyle(colorCells[index]).backgroundColor}`
+        });
+        for (let j = 0; j < colorCells.length; j++) {
+            //TODO Make Selection Effect
+            
+        }
+    })
+}
+

@@ -2,8 +2,7 @@
 // Cursor Mods: normal, marker
 let cursorMod = 'normal';
 
-let opacity = 0.5;
-let color = `rgba(255,212,101,${opacity})`;
+let color = `rgba(255,212,101,0.8)`;
 
 let style = null;
 
@@ -29,8 +28,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
                 
     }
     if (message.action === 'changeOpacity'){
-        opacity = message.opacityValue;
-        color = `rgba(255,212,101,${opacity})`
+        color = `rgba(255,212,101,${message.opacityValue})`;
+        appendStyle();
     }
   });
 
@@ -343,7 +342,7 @@ let selectedText = ""; // Variable to store selected text
             if (node.nextSibling != null)
                 return node.nextSibling;
         else if (direction == 'r')
-            if (node.previousSibling != null)
+            if (node.previousSibling != null) // FIXME: Check here later. There is a problem occured.
                 return node.previousSibling;
 
         return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
@@ -363,7 +362,7 @@ let selectedText = ""; // Variable to store selected text
         range.setStart(node, startOffset);
         range.setEnd(node, endOffset);
 
-        console.log(range);
+        console.log(color);
 
         var span = document.createElement('span');
             span.className = 'highlight';

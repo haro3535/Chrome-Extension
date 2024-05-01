@@ -783,6 +783,10 @@ video {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
+.ease-linear {
+  transition-timing-function: linear;
+}
+
 .hover\:rounded-l-2xl:hover {
   border-top-left-radius: 1rem;
   border-bottom-left-radius: 1rem;
@@ -791,6 +795,11 @@ video {
 .hover\:rounded-r-2xl:hover {
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
+}
+
+.hover\:border-blue-400:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(96 165 250 / var(--tw-border-opacity));
 }
 
 .hover\:bg-cyan-600:hover {

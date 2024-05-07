@@ -52,6 +52,9 @@ function appendStyle(){
             ::-moz-selection {
                 background-color: ${color};
             }
+            body {
+                cursor: text;
+            }
         `;
         document.head.appendChild(style);
     }

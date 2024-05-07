@@ -7,7 +7,7 @@
       "email": "harunonur.ho@gmail.com",
       "website": "https://www.harunonur.com/"
     },
-    "version": "1.0",
+    "version": "1.0.0.0",
     "action": {
       "default_popup": "/popup/popup.html",
       "default_icon": "hello_extensions.png"

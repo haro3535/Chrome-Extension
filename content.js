@@ -225,7 +225,8 @@ let selectedText = ""; // Variable to store selected text
      * @param {Node} node
      */
     function findSelectedChildofRootElement(commonAncestorContainer, node){
-
+        // This function finds sibling nodes that are contains selected TEXT nodes
+        // that are under the commonAncestorContainer node.
         
         let currentElement = node;
         while (currentElement.parentElement !== commonAncestorContainer){

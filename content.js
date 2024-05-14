@@ -197,11 +197,13 @@ let selectedText = ""; // Variable to store selected text
                 }
                 
                 highlight(ancorNode,anchorOffset,ancorNode.length);
+                highlight(focusNode,0,focusOffset);
         
+                // TODO: Sıkıntı var
                 horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', ancorNode);
                 horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'r', focusNode);
                 
-                highlight(focusNode,0,focusOffset);
+                
             }
             else if (starterNodeIndex > endNodeIndex){
                 let tIndex = endNodeIndex + 1;
@@ -210,12 +212,14 @@ let selectedText = ""; // Variable to store selected text
                     tIndex++;
                 }
 
-                //highlight(ancorNode,anchorOffset,ancorNode.length);
+                highlight(ancorNode,0,anchorOffset);
+                highlight(focusNode,focusOffset,focusNode.length);
 
+                // TODO: Sıkıntı var
                 horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', ancorNode);
                 horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'l', focusNode);
                 
-                //highlight(focusNode,0,focusOffset);
+                
             }
         }
     }
@@ -232,6 +236,7 @@ let selectedText = ""; // Variable to store selected text
         while (currentElement.parentElement !== commonAncestorContainer){
             currentElement = currentElement.parentElement;
         }
+        console.log(currentElement);
 
         return Array.prototype.indexOf.call(commonAncestorContainer.childNodes, currentElement);
     }
@@ -312,8 +317,8 @@ let selectedText = ""; // Variable to store selected text
         if (direction == 'l'){
             
             // Burada next sibling null ise sıkıntı çıkmasın diye yapıyorum
-            let nextSibling = node.nextSibling;
-            if (nextSibling != null){
+            if (node.nextSibling != null && node.nextSibling != undefined){
+                let nextSibling = node.nextSibling;
                 if(node != startEnd)
                     traversRootFromTopToBottom(nextSibling);
                 horizontalStepFunction(nextSibling, targetNode, direction, null);
@@ -323,8 +328,8 @@ let selectedText = ""; // Variable to store selected text
         }
         else if (direction == 'r'){
             // Burada previous sibling null ise sıkıntı çıkmasın diye yapıyorum
-            let prevSibling = node.previousSibling;
-            if (prevSibling != null){
+            if (node.previousSibling != null && node.previousSibling != undefined){
+                let prevSibling = node.previousSibling;
                 if(node != startEnd)
                     traversRootFromTopToBottom(prevSibling);
                 horizontalStepFunction(prevSibling, targetNode, direction, null);
@@ -346,7 +351,7 @@ let selectedText = ""; // Variable to store selected text
      */
     function findUpperParentWhichIsHaveNotNullSibling(node, targetNode, direction){
 
-
+        
         if (node === targetNode)
             return targetNode;
         
@@ -356,7 +361,7 @@ let selectedText = ""; // Variable to store selected text
         else if (direction == 'r')
             if (node.previousSibling != null) // FIXME: Check here later. There is a problem occured.
                 return node.previousSibling;
-
+        
         return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
     }
 

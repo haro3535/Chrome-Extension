@@ -32,6 +32,7 @@ document.getElementById("saveButton").addEventListener('click', () => {
 })
 
 const colorCells = document.getElementsByClassName("colorcell");
+colorCells[0].style.borderColor = "rgb(96,165,250)";
 
 for (let index = 0; index < colorCells.length; index++) {
     colorCells[index].addEventListener("click", (event) => {
@@ -40,9 +41,11 @@ for (let index = 0; index < colorCells.length; index++) {
             action: 'changeColor',
             color: `${getComputedStyle(colorCells[index]).backgroundColor}`
         });
-        for (let j = 0; j < colorCells.length; j++) {
-            //TODO Make Selection Effect
-            
+
+        for (let j = 0; j < colorCells.length; j++) { 
+            if (colorCells[j] !== event.target) 
+                colorCells[j].style.borderColor = "";
+            else event.target.style.borderColor = "rgb(96,165,250)";
         }
     })
 }

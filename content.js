@@ -6,6 +6,7 @@ let alpha = 0.8
 let color = `rgba(255,212,101,${alpha})`;
 
 let style = null;
+let newContentFlag = false;
 
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
@@ -191,7 +192,8 @@ let selectedText = ""; // Variable to store selected text
 
                 let tIndex = starterNodeIndex + 1;
                 while (tIndex != endNodeIndex){
-                    traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                    let copyChildNodes = commonAncestorContainer.childNodes;
+                    traversRootFromTopToBottom(copyChildNodes[tIndex]);
                     console.log("Buraya geldimmm");
                     tIndex++;
                 }
@@ -248,31 +250,20 @@ let selectedText = ""; // Variable to store selected text
      */
     function traversRootFromTopToBottom(node){
 
+        debugger;
         if (node == null)
             return;
 
-        //console.log("Node Type: " + node);
-
-        if (node.nodeType === Node.TEXT_NODE && node.nodeValue != ""){
-            console.log(node);
+        // Check if the current node is a text node
+        if (node.nodeType === Node.TEXT_NODE) {
+            console.log("Text node found:", node.nodeValue);
             highlight(node, 0, node.length);
-            return;
+            return; // Stop further traversal
         }
-        
-        if (node.hasChildNodes() && node.nodeType !== Node.TEXT_NODE)
-        {
-            console.log("Node Type: " + node);
-            console.log("Has Child: " + node.hasChildNodes());
-            console.log("Childs" + node.childNodes.length);
 
-            let childNumber = node.childNodes.length;
-
-            if (childNumber == 1)
-                traversRootFromTopToBottom(node.childNodes[0]);
-            else if (childNumber > 1)
-            node.childNodes.forEach(child => {
-                traversRootFromTopToBottom(child);
-            })
+        // Ensure the node has child nodes before trying to traverse them
+        if (node.hasChildNodes()) {
+            node.childNodes.forEach(child => traversRootFromTopToBottom(child));
         }
     }
 
@@ -387,13 +378,16 @@ let selectedText = ""; // Variable to store selected text
         range.surroundContents(span);
 
         window.getSelection().removeAllRanges();
+
     }
 
 
-
-
-
-
+    function checkNewContentFlagIsRised(){
+        if(newContentFlag){
+            newContentFlag = false;
+            return true;
+        }else return false;
+    }
 
 
 /**

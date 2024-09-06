@@ -13,7 +13,7 @@
       "default_icon": "hello_extensions.png"
     },
     "permissions": [
-      "sidePanel", "activeTab", "tabs"
+      "sidePanel", "activeTab", "tabs","declarativeContent"
     ],
     "side_panel": {
       "default_path": "/sidepanel/sidepanel.html"
@@ -30,6 +30,12 @@
           "http://*/*", 
           "https://*/*"
         ]
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["images/mycursor16x16.png","images/mycursor32x32.png"],
+        "matches": ["<all_urls>"]
       }
     ]
   }

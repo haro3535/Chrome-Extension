@@ -54,7 +54,7 @@ function appendStyle(){
                 background-color: ${color};
             }
             body {
-                cursor: text;
+                cursor: url(${chrome.runtime.getURL("images/mycursor16x16.png")}), auto;
             }
         `;
         document.head.appendChild(style);
@@ -364,7 +364,7 @@ let selectedText = ""; // Variable to store selected text
      */
     function highlight(node, startOffset, endOffset){
 
-        console.log(startOffset, endOffset);
+        // console.log(startOffset, endOffset);
 
         const range = document.createRange();
         range.setStart(node, startOffset);

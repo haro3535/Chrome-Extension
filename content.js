@@ -1,4 +1,4 @@
-
+import {sayHello} from "./services/markerService.js";
 // Cursor Mods: normal, marker
 let cursorMod = 'normal';
 
@@ -7,6 +7,9 @@ let color = `rgba(255,212,101,${alpha})`;
 
 let style = null;
 let newContentFlag = false;
+
+
+
 
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
@@ -166,7 +169,7 @@ let selectedText = ""; // Variable to store selected text
     function myHighlightFunction() {
 
         let selection = window.getSelection();
-
+        sayHello();
         let ancorNode = selection.anchorNode;
         let anchorOffset = selection.anchorOffset;
         let focusNode = selection.focusNode;
@@ -256,6 +259,8 @@ let selectedText = ""; // Variable to store selected text
 
         // Check if the current node is a text node
         if (node.nodeType === Node.TEXT_NODE) {
+            // if (node.textContent === '')
+            //     return
             console.log("Text node found:", node.nodeValue);
             highlight(node, 0, node.length);
             return; // Stop further traversal

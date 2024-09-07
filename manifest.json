@@ -25,11 +25,10 @@
     "content_scripts": [
       {
         "js": ["content.js"],
+        
         "css": ["marker.css"],
-        "matches": [
-          "http://*/*", 
-          "https://*/*"
-        ]
+        "matches": ["<all_urls>"],
+        "type": "module"
       }
     ],
     "web_accessible_resources": [

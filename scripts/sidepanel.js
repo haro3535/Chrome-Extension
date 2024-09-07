@@ -1,4 +1,6 @@
 
+// Set the year
+document.getElementById("year").textContent = new Date().getFullYear();
 
 let opacitySpan = document.getElementById('opacityValueSpan');
 

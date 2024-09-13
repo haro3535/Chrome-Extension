@@ -1,4 +1,4 @@
-// Cursor Mods: normal, marker
+// Cursor Mods: normal, marker, eraser?
 let cursorMod = 'normal';
 
 let alpha = 0.8
@@ -159,7 +159,7 @@ let selectedText = ""; // Variable to store selected text
     }
 
 
-
+    // Main function 
 
     function myHighlightFunction() {
 

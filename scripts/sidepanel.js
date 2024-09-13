@@ -29,9 +29,6 @@ document.getElementById('markingMod').addEventListener('click', () => {
     });
 });
 
-document.getElementById("saveButton").addEventListener('click', () => {
-    
-})
 
 const colorCells = document.getElementsByClassName("colorcell");
 colorCells[0].style.borderColor = "rgb(96,165,250)";

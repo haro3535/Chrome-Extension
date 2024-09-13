@@ -25,7 +25,6 @@
     "content_scripts": [
       {
         "js": ["content.js"],
-        
         "css": ["marker.css"],
         "matches": ["<all_urls>"],
         "type": "module"
@@ -33,7 +32,10 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["images/mycursor16x16.png","images/mycursor32x32.png"],
+        "resources": [
+          "images/mycursor16x16.png",
+          "images/mycursor32x32.png"
+        ],
         "matches": ["<all_urls>"]
       }
     ]

@@ -1,0 +1,2 @@
+Gerekenden fazla span elemanı ekliyor.
+Bazı yerlerde atlamalar yapıyor.

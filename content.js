@@ -382,7 +382,7 @@ let selectedText = ""; // Variable to store selected text
             if (node.previousSibling != null) // FIXME: Check here later. There is a problem occured.
                 return node.previousSibling;
         
-        if(node.parentNode != null)
+        if(node.parentElement != null)
            return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
         else return; 
     }

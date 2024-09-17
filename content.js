@@ -164,61 +164,91 @@ let selectedText = ""; // Variable to store selected text
     function myHighlightFunction() {
 
         let selection = window.getSelection();
-        let ancorNode = selection.anchorNode;
+        let anchorNode = selection.anchorNode;
         let anchorOffset = selection.anchorOffset;
         let focusNode = selection.focusNode;
         let focusOffset = selection.focusOffset;
+        
 
-
-        if (ancorNode === focusNode){
+        if (anchorNode === focusNode){
             highlightSelectedText();
         }
         else {
             let commonAncestorContainer = selection.getRangeAt(0).commonAncestorContainer;
             console.log(commonAncestorContainer);
-            // TODO: Buradana devam tüm çocuk elementlere kadar ulaşıcan taki focuse nodu bulana kadar
-            let anchorParentNode = ancorNode.parentNode;
-            let focusParentNode = focusNode.parentNode;
+            
 
-            let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, ancorNode);
-            let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
-            console.log("Starter Node: " + starterNodeIndex);
-            console.log("End Node: " + endNodeIndex);
+            if(checkDependencyOfNodes(anchorNode,focusNode)){
+                // Check if anchor and focus nodes are siblings
+                let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
 
-            if (starterNodeIndex < endNodeIndex){
+                if (starterNodeIndex < endNodeIndex){
+                    highlight(anchorNode,anchorOffset,anchorNode.length);
 
-                let tIndex = starterNodeIndex + 1;
-                while (tIndex != endNodeIndex){
-                    let copyChildNodes = commonAncestorContainer.childNodes;
-                    traversRootFromTopToBottom(copyChildNodes[tIndex]);
-                    console.log("Buraya geldimmm");
-                    tIndex++;
+                    let tIndex = starterNodeIndex + 1;
+                    while (tIndex != endNodeIndex){
+                        let copyChildNodes = commonAncestorContainer.childNodes;
+                        traversRootFromTopToBottom(copyChildNodes[tIndex]);
+                        tIndex++;
+                    }
+
+                    highlight(focusNode,0,focusOffset);
                 }
-                
-                highlight(ancorNode,anchorOffset,ancorNode.length);
-                highlight(focusNode,0,focusOffset);
-        
-                // TODO: Sıkıntı var
-                horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', ancorNode);
-                horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'r', focusNode);
-                
-                
+                else{
+                    highlight(anchorNode,0,anchorOffset);
+
+                    let tIndex = endNodeIndex + 1;
+                    while (tIndex != starterNodeIndex){
+                        traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                        tIndex++;
+                    }
+
+                    highlight(focusNode,focusOffset,focusNode.length);
+                }
             }
-            else if (starterNodeIndex > endNodeIndex){
-                let tIndex = endNodeIndex + 1;
-                while (tIndex != starterNodeIndex){
-                    traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
-                    tIndex++;
+            else {
+                // They are not siblings
+                let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                
+
+                if (starterNodeIndex < endNodeIndex){
+
+                    highlight(anchorNode,anchorOffset,anchorNode.length);
+
+                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', anchorNode);
+
+                    let tIndex = starterNodeIndex + 1;
+                    while (tIndex != endNodeIndex){
+                        let copyChildNodes = commonAncestorContainer.childNodes;
+                        traversRootFromTopToBottom(copyChildNodes[tIndex]);
+                        console.log("Buraya geldimmm");
+                        tIndex++;
+                    }
+                    
+                    highlight(focusNode,0,focusOffset);
+                    
+                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'r', focusNode);
+                    
+                    
                 }
-
-                highlight(ancorNode,0,anchorOffset);
-                highlight(focusNode,focusOffset,focusNode.length);
-
-                // TODO: Sıkıntı var
-                horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', ancorNode);
-                horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'l', focusNode);
-                
-                
+                else if (starterNodeIndex > endNodeIndex){
+                    let tIndex = endNodeIndex + 1;
+                    while (tIndex != starterNodeIndex){
+                        traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                        tIndex++;
+                    }
+    
+                    highlight(anchorNode,0,anchorOffset);
+                    highlight(focusNode,focusOffset,focusNode.length);
+    
+                    // TODO: Sıkıntı var
+                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', anchorNode);
+                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'l', focusNode);
+                    
+                    
+                }
             }
         }
     }
@@ -247,8 +277,7 @@ let selectedText = ""; // Variable to store selected text
      * @param {Node} node
      */
     function traversRootFromTopToBottom(node){
-
-        debugger;
+        
         if (node == null)
             return;
 
@@ -341,7 +370,7 @@ let selectedText = ""; // Variable to store selected text
      * @param {*} direction
      */
     function findUpperParentWhichIsHaveNotNullSibling(node, targetNode, direction){
-
+        // FIXME: Bu fonksiyonda hata var
         
         if (node === targetNode)
             return targetNode;
@@ -353,7 +382,9 @@ let selectedText = ""; // Variable to store selected text
             if (node.previousSibling != null) // FIXME: Check here later. There is a problem occured.
                 return node.previousSibling;
         
-        return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
+        if(node.parentNode != null)
+           return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
+        else return; 
     }
 
     // Highlites current node
@@ -438,3 +469,39 @@ function saveHiglighting(element, startOffset, endOffset) {
     
 }  
 
+
+
+
+
+
+
+
+ 
+
+/**
+     * @param {Node} anchorNode
+     * @param {Node} focusNode 
+     */
+function checkDependencyOfNodes(anchorNode, focusNode) {
+    // There are two situation:
+    //  1) Ancor node and focus node are not siblings.
+    //  2) They are siblings.
+    //
+    // These situations causes futer problem while computing.
+    // This function finds that given nodes (anchor and focus) are siblings (dependent) or not.
+    
+    if(anchorNode != null || anchorNode !== undefined){
+        let parent = anchorNode.parentNode;
+        if(parent != null || parent != undefined){
+            for (let child of parent.childNodes) {
+                console.log("object");
+                if (child === focusNode) {
+                    return true; // They are dependent
+                }
+            }
+            return false; // They are independent
+        }
+        throw new Error("Parent element is null or undefined!"); 
+    }
+    else throw new Error("Anchor element is null or undefined!"); 
+}

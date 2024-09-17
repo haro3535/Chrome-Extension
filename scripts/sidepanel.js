@@ -49,3 +49,10 @@ for (let index = 0; index < colorCells.length; index++) {
     })
 }
 
+
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
+    if(message.action === "addTextCard"){
+        // Buraya sidepanelde gösterilecek mesajların okunmasını ekle
+    }
+})
+

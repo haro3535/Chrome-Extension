@@ -171,7 +171,7 @@ let selectedText = ""; // Variable to store selected text
         
 
         if (anchorNode === focusNode){
-            highlightSelectedText();
+            highlight(anchorNode,anchorOffset,focusOffset);
         }
         else {
             let commonAncestorContainer = selection.getRangeAt(0).commonAncestorContainer;
@@ -186,7 +186,7 @@ let selectedText = ""; // Variable to store selected text
                 if (starterNodeIndex < endNodeIndex){
                     highlight(anchorNode,anchorOffset,anchorNode.length);
 
-                    let tIndex = starterNodeIndex + 1;
+                    let tIndex = starterNodeIndex + 2;
                     while (tIndex != endNodeIndex){
                         let copyChildNodes = commonAncestorContainer.childNodes;
                         traversRootFromTopToBottom(copyChildNodes[tIndex]);
@@ -211,7 +211,6 @@ let selectedText = ""; // Variable to store selected text
                 // They are not siblings
                 let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
                 let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
-                
 
                 if (starterNodeIndex < endNodeIndex){
 
@@ -219,7 +218,7 @@ let selectedText = ""; // Variable to store selected text
 
                     horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', anchorNode);
 
-                    let tIndex = starterNodeIndex + 1;
+                    let tIndex = starterNodeIndex + 2; // 2 comes from to call next node after the start node
                     while (tIndex != endNodeIndex){
                         let copyChildNodes = commonAncestorContainer.childNodes;
                         traversRootFromTopToBottom(copyChildNodes[tIndex]);
@@ -227,24 +226,29 @@ let selectedText = ""; // Variable to store selected text
                         tIndex++;
                     }
                     
-                    highlight(focusNode,0,focusOffset);
-                    
                     horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'r', focusNode);
+                    
+                    highlight(focusNode,0,focusOffset);
                     
                     
                 }
                 else if (starterNodeIndex > endNodeIndex){
+
+                    highlight(anchorNode,0,anchorOffset);
+
+                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', anchorNode);
+
                     let tIndex = endNodeIndex + 1;
                     while (tIndex != starterNodeIndex){
                         traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
                         tIndex++;
                     }
     
-                    highlight(anchorNode,0,anchorOffset);
+                    
                     highlight(focusNode,focusOffset,focusNode.length);
     
                     // TODO: Sıkıntı var
-                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', anchorNode);
+                    
                     horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'l', focusNode);
                     
                     
@@ -285,7 +289,7 @@ let selectedText = ""; // Variable to store selected text
         if (node.nodeType === Node.TEXT_NODE) {
             if (node.textContent.trim().length == 0)
                  return;
-            console.log("Text node found:", node.nodeValue);
+            console.log("Text node found:", node.nodeValue);      
             highlight(node, 0, node.length);
             return; // Stop further traversal
         }
@@ -294,6 +298,7 @@ let selectedText = ""; // Variable to store selected text
         if (node.hasChildNodes()) {
             node.childNodes.forEach(child => traversRootFromTopToBottom(child));
         }
+        else return;
     }
 
     /**
@@ -344,7 +349,7 @@ let selectedText = ""; // Variable to store selected text
                 horizontalStepFunction(nextSibling, targetNode, direction, null);
             }
             else 
-                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, null);
+                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, startEnd);
         }
         else if (direction == 'r'){
             // Burada previous sibling null ise sıkıntı çıkmasın diye yapıyorum
@@ -355,7 +360,7 @@ let selectedText = ""; // Variable to store selected text
                 horizontalStepFunction(prevSibling, targetNode, direction, null);
             }
             else 
-                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, null);
+                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, startEnd);
         }
         else 
         {
@@ -409,6 +414,9 @@ let selectedText = ""; // Variable to store selected text
         range.surroundContents(span);
 
         window.getSelection().removeAllRanges();
+        debugger;
+
+        deleteUnwantedTextElements(node.parentElement,Array.prototype.indexOf.call(node.parentElement.children, node) - 1);
 
     }
 
@@ -504,4 +512,21 @@ function checkDependencyOfNodes(anchorNode, focusNode) {
         throw new Error("Parent element is null or undefined!"); 
     }
     else throw new Error("Anchor element is null or undefined!"); 
+}
+
+/**
+ * 
+ * @param {Node} parentNode 
+ * @param {Number} nodeIndex 
+ */
+function deleteUnwantedTextElements(parentNode,nodeIndex){
+
+    try {
+        let cNode = parentNode.childNodes.item(nodeIndex); // The node itself
+        if(cNode == Node.TEXT_NODE && cNode.textContent == ""){
+            parentNode.removeChild(cNode);
+        }
+    } catch (error) {
+        console.error(error);
+    }
 }

@@ -1,2 +1,7 @@
 Gerekenden fazla span elemanı ekliyor.
 Bazı yerlerde atlamalar yapıyor.
+
+
+
+18.09.2024
+Span eklerken boş text elementi oluşturuyor eğer text nodunun hepsini kaspıyorsa bunu düzeltmen lazım çünkü index problemlerine yol açıyor.

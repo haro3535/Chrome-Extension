@@ -1,7 +1,10 @@
-Gerekenden fazla span elemanı ekliyor.
-Bazı yerlerde atlamalar yapıyor.
+FIXED: Gerekenden fazla span elemanı ekliyor.
+FIXED: Bazı yerlerde atlamalar yapıyor.
 
 
 
 18.09.2024
-Span eklerken boş text elementi oluşturuyor eğer text nodunun hepsini kaspıyorsa bunu düzeltmen lazım çünkü index problemlerine yol açıyor.
+FIXED: Span eklerken boş text elementi oluşturuyor eğer text nodunun hepsini kaspıyorsa bunu düzeltmen lazım çünkü index problemlerine yol açıyor. 
+
+19.09.2024
+Aşağıdan yukarı işaretlemelerde hata çıkardı.

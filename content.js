@@ -190,6 +190,8 @@ let selectedText = ""; // Variable to store selected text
                     while (tIndex != endNodeIndex){
                         let copyChildNodes = commonAncestorContainer.childNodes;
                         traversRootFromTopToBottom(copyChildNodes[tIndex]);
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
                         tIndex++;
                     }
 
@@ -201,6 +203,8 @@ let selectedText = ""; // Variable to store selected text
                     let tIndex = endNodeIndex + 1;
                     while (tIndex != starterNodeIndex){
                         traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
                         tIndex++;
                     }
 
@@ -222,7 +226,8 @@ let selectedText = ""; // Variable to store selected text
                     while (tIndex != endNodeIndex){
                         let copyChildNodes = commonAncestorContainer.childNodes;
                         traversRootFromTopToBottom(copyChildNodes[tIndex]);
-                        console.log("Buraya geldimmm");
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
                         tIndex++;
                     }
                     
@@ -241,6 +246,8 @@ let selectedText = ""; // Variable to store selected text
                     let tIndex = endNodeIndex + 1;
                     while (tIndex != starterNodeIndex){
                         traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
                         tIndex++;
                     }
     
@@ -287,8 +294,11 @@ let selectedText = ""; // Variable to store selected text
 
         // Check if the current node is a text node
         if (node.nodeType === Node.TEXT_NODE) {
-            if (node.textContent.trim().length == 0)
-                 return;
+            if (node.textContent.trim().length == 0){
+                node.parentElement.removeChild(node);
+                return;
+            }
+                 
             console.log("Text node found:", node.nodeValue);      
             highlight(node, 0, node.length);
             return; // Stop further traversal
@@ -301,32 +311,32 @@ let selectedText = ""; // Variable to store selected text
         else return;
     }
 
-    /**
-     * @param {Node} node
-     * @param {Node} targetNode 
-     * @param {*} direction
-     */
-    function elevateBottomtoTop(node, targetNode, direction){
+    // /**
+    //  * @param {Node} node
+    //  * @param {Node} targetNode 
+    //  * @param {*} direction
+    //  */
+    // function elevateBottomtoTop(node, targetNode, direction){
 
         
 
-        if (node === targetNode || node === null)
-            return null;
+    //     if (node === targetNode || node === null)
+    //         return null;
 
 
-        // Yukari dogru gitmeden once verilen dogrultuda kardeslerini tariyor
-        let currentSibling = node;
-        while(currentSibling != null){
-            if(direction == 'l')
-                currentSibling = currentSibling.nextSibling;
-            else if (direction == 'r')
-                currentSibling = currentSibling.previousSibling;
-            traversRootFromTopToBottom(currentSibling);
-        }
+    //     // Yukari dogru gitmeden once verilen dogrultuda kardeslerini tariyor
+    //     let currentSibling = node;
+    //     while(currentSibling != null){
+    //         if(direction == 'l')
+    //             currentSibling = currentSibling.nextSibling;
+    //         else if (direction == 'r')
+    //             currentSibling = currentSibling.previousSibling;
+    //         traversRootFromTopToBottom(currentSibling);
+    //     }
 
-        elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction);
+    //     elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction);
              
-    }
+    // }
 
     /**
      * @param {Node} node
@@ -414,9 +424,8 @@ let selectedText = ""; // Variable to store selected text
         range.surroundContents(span);
 
         window.getSelection().removeAllRanges();
-        debugger;
 
-        deleteUnwantedTextElements(node.parentElement,Array.prototype.indexOf.call(node.parentElement.children, node) - 1);
+        deleteUnwantedTextElements(span);
 
     }
 
@@ -516,17 +525,38 @@ function checkDependencyOfNodes(anchorNode, focusNode) {
 
 /**
  * 
- * @param {Node} parentNode 
- * @param {Number} nodeIndex 
+ * @param {Node} spanNode 
  */
-function deleteUnwantedTextElements(parentNode,nodeIndex){
+function deleteUnwantedTextElements(spanNode){
 
     try {
-        let cNode = parentNode.childNodes.item(nodeIndex); // The node itself
-        if(cNode == Node.TEXT_NODE && cNode.textContent == ""){
-            parentNode.removeChild(cNode);
+        if(spanNode.previousSibling != null && spanNode.previousSibling.nodeType == Node.TEXT_NODE && spanNode.previousSibling.textContent == ""){
+            if (spanNode.parentElement != null)
+                spanNode.parentElement.removeChild(spanNode.previousSibling);
+        }
+
+        if(spanNode.nextSibling != null && spanNode.nextSibling.nodeType == Node.TEXT_NODE && spanNode.nextSibling.textContent == ""){
+            if (spanNode.parentElement != null)
+                spanNode.parentElement.removeChild(spanNode.nextSibling);
         }
     } catch (error) {
         console.error(error);
     }
+}
+
+/**
+ * 
+ * @param {Node} node 
+ */
+function findTheIndexOfCurrentNode(node){
+    debugger;
+    if (node.parentElement != null){
+        let parent = node.parentElement;
+        for (let index = 0; index < parent.childNodes.length; index++) {
+            if(parent.childNodes.item(index) === node)
+                return index;
+        }
+        return -1;
+    }
+    else return 0;
 }

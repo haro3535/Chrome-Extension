@@ -168,7 +168,6 @@ let selectedText = ""; // Variable to store selected text
         let anchorOffset = selection.anchorOffset;
         let focusNode = selection.focusNode;
         let focusOffset = selection.focusOffset;
-        
 
         if (anchorNode === focusNode){
             highlight(anchorNode,anchorOffset,focusOffset);
@@ -186,7 +185,7 @@ let selectedText = ""; // Variable to store selected text
                 if (starterNodeIndex < endNodeIndex){
                     highlight(anchorNode,anchorOffset,anchorNode.length);
 
-                    let tIndex = starterNodeIndex + 2;
+                    let tIndex = starterNodeIndex + 1;
                     while (tIndex != endNodeIndex){
                         let copyChildNodes = commonAncestorContainer.childNodes;
                         traversRootFromTopToBottom(copyChildNodes[tIndex]);
@@ -222,7 +221,7 @@ let selectedText = ""; // Variable to store selected text
 
                     horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', anchorNode);
 
-                    let tIndex = starterNodeIndex + 2; // 2 comes from to call next node after the start node
+                    let tIndex = starterNodeIndex + 1; // 2 comes from to call next node after the start node
                     while (tIndex != endNodeIndex){
                         let copyChildNodes = commonAncestorContainer.childNodes;
                         traversRootFromTopToBottom(copyChildNodes[tIndex]);
@@ -412,9 +411,15 @@ let selectedText = ""; // Variable to store selected text
 
         // console.log(startOffset, endOffset);
 
+        if (startOffset > endOffset) {
+            // Swap the values if they are in reverse order
+            [startOffset, endOffset] = [endOffset, startOffset];
+        }
+    
         const range = document.createRange();
         range.setStart(node, startOffset);
         range.setEnd(node, endOffset);
+        
 
         console.log(color);
 

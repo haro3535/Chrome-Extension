@@ -168,6 +168,7 @@ let selectedText = ""; // Variable to store selected text
         let anchorOffset = selection.anchorOffset;
         let focusNode = selection.focusNode;
         let focusOffset = selection.focusOffset;
+        debugger;
 
         if (anchorNode === focusNode){
             highlight(anchorNode,anchorOffset,focusOffset);
@@ -219,7 +220,7 @@ let selectedText = ""; // Variable to store selected text
 
                     highlight(anchorNode,anchorOffset,anchorNode.length);
 
-                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', anchorNode);
+                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'n', anchorNode);
 
                     let tIndex = starterNodeIndex + 1; // 2 comes from to call next node after the start node
                     while (tIndex != endNodeIndex){
@@ -230,7 +231,7 @@ let selectedText = ""; // Variable to store selected text
                         tIndex++;
                     }
                     
-                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'r', focusNode);
+                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'p', focusNode);
                     
                     highlight(focusNode,0,focusOffset);
                     
@@ -240,7 +241,7 @@ let selectedText = ""; // Variable to store selected text
 
                     highlight(anchorNode,0,anchorOffset);
 
-                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', anchorNode);
+                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'p', anchorNode);
 
                     let tIndex = endNodeIndex + 1;
                     while (tIndex != starterNodeIndex){
@@ -255,7 +256,7 @@ let selectedText = ""; // Variable to store selected text
     
                     // TODO: Sıkıntı var
                     
-                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'l', focusNode);
+                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'n', focusNode);
                     
                     
                 }
@@ -264,22 +265,7 @@ let selectedText = ""; // Variable to store selected text
     }
 
 
-    /**
-     * @param {Node} commonAncestorContainer
-     * @param {Node} node
-     */
-    function findSelectedChildofRootElement(commonAncestorContainer, node){
-        // This function finds sibling nodes that are contains selected TEXT nodes
-        // that are under the commonAncestorContainer node.
-        
-        let currentElement = node;
-        while (currentElement.parentElement !== commonAncestorContainer){
-            currentElement = currentElement.parentElement;
-        }
-        console.log(currentElement);
-
-        return Array.prototype.indexOf.call(commonAncestorContainer.childNodes, currentElement);
-    }
+    
 
 
     // Travers through top to bottom (for the sibling parrent nodes that are between start parent node and end parent node)
@@ -310,33 +296,6 @@ let selectedText = ""; // Variable to store selected text
         else return;
     }
 
-    // /**
-    //  * @param {Node} node
-    //  * @param {Node} targetNode 
-    //  * @param {*} direction
-    //  */
-    // function elevateBottomtoTop(node, targetNode, direction){
-
-        
-
-    //     if (node === targetNode || node === null)
-    //         return null;
-
-
-    //     // Yukari dogru gitmeden once verilen dogrultuda kardeslerini tariyor
-    //     let currentSibling = node;
-    //     while(currentSibling != null){
-    //         if(direction == 'l')
-    //             currentSibling = currentSibling.nextSibling;
-    //         else if (direction == 'r')
-    //             currentSibling = currentSibling.previousSibling;
-    //         traversRootFromTopToBottom(currentSibling);
-    //     }
-
-    //     elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction);
-             
-    // }
-
     /**
      * @param {Node} node
      * @param {Node} targetNode 
@@ -348,7 +307,7 @@ let selectedText = ""; // Variable to store selected text
         if (node === targetNode)
             return;
 
-        if (direction == 'l'){
+        if (direction == 'n'){
             
             // Burada next sibling null ise sıkıntı çıkmasın diye yapıyorum
             if (node.nextSibling != null && node.nextSibling != undefined){
@@ -360,7 +319,7 @@ let selectedText = ""; // Variable to store selected text
             else 
                 horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, startEnd);
         }
-        else if (direction == 'r'){
+        else if (direction == 'p'){
             // Burada previous sibling null ise sıkıntı çıkmasın diye yapıyorum
             if (node.previousSibling != null && node.previousSibling != undefined){
                 let prevSibling = node.previousSibling;
@@ -389,10 +348,10 @@ let selectedText = ""; // Variable to store selected text
         if (node === targetNode)
             return targetNode;
         
-        if(direction == 'l')
+        if(direction == 'n')
             if (node.nextSibling != null)
                 return node.nextSibling;
-        else if (direction == 'r')
+        else if (direction == 'p')
             if (node.previousSibling != null) // FIXME: Check here later. There is a problem occured.
                 return node.previousSibling;
         
@@ -533,7 +492,7 @@ function checkDependencyOfNodes(anchorNode, focusNode) {
  * @param {Node} spanNode 
  */
 function deleteUnwantedTextElements(spanNode){
-
+    debugger;
     try {
         if(spanNode.previousSibling != null && spanNode.previousSibling.nodeType == Node.TEXT_NODE && spanNode.previousSibling.textContent == ""){
             if (spanNode.parentElement != null)
@@ -564,4 +523,21 @@ function findTheIndexOfCurrentNode(node){
         return -1;
     }
     else return 0;
+}
+
+/**
+     * @param {Node} commonAncestorContainer
+     * @param {Node} node
+     */
+function findSelectedChildofRootElement(commonAncestorContainer, node){
+    // This function finds sibling nodes that are contains selected TEXT nodes
+    // that are under the commonAncestorContainer node.
+    
+    let currentElement = node;
+    while (currentElement.parentElement !== commonAncestorContainer){
+        currentElement = currentElement.parentElement;
+    }
+    console.log(currentElement);
+
+    return Array.prototype.indexOf.call(commonAncestorContainer.childNodes, currentElement);
 }

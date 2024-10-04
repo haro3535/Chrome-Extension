@@ -16,11 +16,18 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
             appendStyle();
             
         }
-        else {
+        else if (cursorMod == "cursor"){
             console.log("cursor");
             if(style != null)
             {
-                
+                document.head.removeChild(style);
+                style = null;
+            }
+        }
+        else {
+            console.log("eraser");
+            if(style != null)
+            {
                 document.head.removeChild(style);
                 style = null;
             }
@@ -75,6 +82,7 @@ let selectedText = ""; // Variable to store selected text
         if (cursorMod == 'marker')
             selectedText = getSelectedText(window.getSelection());
         //  clearHighlights();
+
     });
 
     // Event listener for mouse up
@@ -84,18 +92,16 @@ let selectedText = ""; // Variable to store selected text
             return;
 
         if (cursorMod == 'marker') {
-            
-            // It returns if ancor and focus is same
             let selection = window.getSelection();
-            //console.log(selection.getRangeAt(0))
-
-            // if (selection.isCollapsed)
-            //     return
-
             myHighlightFunction()
 
             selection.removeAllRanges();
+        }
 
+        if (cursorMod == 'eraser') {
+            let selection = window.getSelection();
+            console.log(selection.anchorNode);
+            deleteHighlite(selection.anchorNode);
         }
     });
 
@@ -540,4 +546,17 @@ function findSelectedChildofRootElement(commonAncestorContainer, node){
     console.log(currentElement);
 
     return Array.prototype.indexOf.call(commonAncestorContainer.childNodes, currentElement);
+}
+
+
+/**
+ * 
+ * @param {HTMLElement} node 
+ */
+function deleteHighlite(node){
+
+    if(node.parentElement.classList.contains("highlight")){
+        // TODO: Direk böyle olmuyor yazıyıda kaldırıyor
+        node.parentElement.remove();
+    }
 }

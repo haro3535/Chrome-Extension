@@ -29,6 +29,13 @@ document.getElementById('markingMod').addEventListener('click', () => {
     });
 });
 
+document.getElementById('eraserMod').addEventListener('click', () => {
+    chrome.runtime.sendMessage({
+        action: 'changeCursor',
+        cursorMod: 'eraser'
+    })
+})
+
 
 const colorCells = document.getElementsByClassName("colorcell");
 colorCells[0].style.borderColor = "rgb(96,165,250)";

@@ -15,11 +15,12 @@ document.getElementById('opacityRange').addEventListener('change', (event) => {
     })
 })
 
-document.getElementById('normalMod').addEventListener('click', () => {
+document.getElementById('cursorMod').addEventListener('click', () => {
     chrome.runtime.sendMessage({
         action: 'changeCursor',
-        cursorMod: 'normal'
+        cursorMod: 'cursor'
     });
+    clickedItem(document.getElementById('cursorMod'));
 });
 
 document.getElementById('markingMod').addEventListener('click', () => {
@@ -27,6 +28,7 @@ document.getElementById('markingMod').addEventListener('click', () => {
         action: 'changeCursor',
         cursorMod: 'marker'
     });
+    clickedItem(document.getElementById('markingMod'));
 });
 
 document.getElementById('eraserMod').addEventListener('click', () => {
@@ -34,6 +36,7 @@ document.getElementById('eraserMod').addEventListener('click', () => {
         action: 'changeCursor',
         cursorMod: 'eraser'
     })
+    clickedItem(document.getElementById('erazerMod'));
 })
 
 
@@ -56,10 +59,33 @@ for (let index = 0; index < colorCells.length; index++) {
     })
 }
 
+/**
+ * 
+ * @param {HTMLElement} element 
+ */
+function clickedItem(element){
+    document.getElementById("selectionPanel").querySelectorAll('div').forEach(item => {
+        console.log(item);
+        if(item.id == element.id){
+            item.style.backgroundColor = "#cbd5e1";
+        }
+        else{
+            item.style.backgroundColor = "#94a3b8";
+        }
+    })
+}
+
+
+
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
     if(message.action === "addTextCard"){
         // Buraya sidepanelde gösterilecek mesajların okunmasını ekle
     }
 })
+
+
+
+
+
 

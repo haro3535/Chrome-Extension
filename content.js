@@ -174,7 +174,6 @@ let selectedText = ""; // Variable to store selected text
         let anchorOffset = selection.anchorOffset;
         let focusNode = selection.focusNode;
         let focusOffset = selection.focusOffset;
-        debugger;
 
         if (anchorNode === focusNode){
             highlight(anchorNode,anchorOffset,focusOffset);
@@ -244,25 +243,43 @@ let selectedText = ""; // Variable to store selected text
                     
                 }
                 else if (starterNodeIndex > endNodeIndex){
+                    debugger;
 
-                    highlight(anchorNode,0,anchorOffset);
+                    highlight(focusNode,focusOffset,focusNode.length);
 
-                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'p', anchorNode);
+                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'n', focusNode);
 
-                    let tIndex = endNodeIndex + 1;
+                    let tIndex = endNodeIndex + 1; // 2 comes from to call next node after the start node
                     while (tIndex != starterNodeIndex){
-                        traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
-                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
-                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                        let copyChildNodes = commonAncestorContainer.childNodes;
+                        traversRootFromTopToBottom(copyChildNodes[tIndex]);
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
                         tIndex++;
                     }
+
+                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'p', anchorNode);
+                    
+                    highlight(anchorNode,0,anchorOffset);
+
+                    // highlight(anchorNode,0,anchorOffset);
+
+                    // horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'p', anchorNode);
+
+                    // let tIndex = endNodeIndex + 1;
+                    // while (tIndex != starterNodeIndex){
+                    //     traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                    //     starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                    //     endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                    //     tIndex++;
+                    // }
     
                     
-                    highlight(focusNode,focusOffset,focusNode.length);
+                    // highlight(focusNode,focusOffset,focusNode.length);
     
-                    // TODO: Sıkıntı var
+                    // // TODO: Sıkıntı var
                     
-                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'n', focusNode);
+                    // horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'n', focusNode);
                     
                     
                 }
@@ -498,7 +515,7 @@ function checkDependencyOfNodes(anchorNode, focusNode) {
  * @param {Node} spanNode 
  */
 function deleteUnwantedTextElements(spanNode){
-    debugger;
+    
     try {
         if(spanNode.previousSibling != null && spanNode.previousSibling.nodeType == Node.TEXT_NODE && spanNode.previousSibling.textContent == ""){
             if (spanNode.parentElement != null)

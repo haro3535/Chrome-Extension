@@ -7,4 +7,7 @@ FIXED: Bazı yerlerde atlamalar yapıyor.
 FIXED: Span eklerken boş text elementi oluşturuyor eğer text nodunun hepsini kaspıyorsa bunu düzeltmen lazım çünkü index problemlerine yol açıyor. 
 
 19.09.2024
-Aşağıdan yukarı işaretlemelerde hata çıkardı.
+FIXED: Aşağıdan yukarı işaretlemelerde hata çıkardı.
+
+25.09.2024
+Üst üste işaretlemede sıkıntı çıkardı.

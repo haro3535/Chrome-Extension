@@ -9,103 +9,36 @@
             <p class="text-2xl text-white py-10 px-3">Dino Marker</p>
         </div>
         <div class="w-auto h-auto flex justify-evenly items-center py-1 px-2 my-2 mr-8 bg-slate-200 rounded-r-full">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-300 cursor-pointer hover:bg-slate-200">
+            <div id="home" class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-300 cursor-pointer hover:bg-slate-200">
                 <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000000">
                     <path d="M264-216h96v-240h240v240h96v-348L480-726 264-564v348Zm-72 72v-456l288-216 288 216v456H528v-240h-96v240H192Zm288-327Z"/>
                 </svg>  
             </div>
-            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-300 cursor-pointer hover:bg-slate-200">
+            <div id="settings" class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-300 cursor-pointer hover:bg-slate-200">
                 <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000000">
                     <path d="m403-96-22-114q-23-9-44.5-21T296-259l-110 37-77-133 87-76q-2-12-3-24t-1-25q0-13 1-25t3-24l-87-76 77-133 110 37q19-16 40.5-28t44.5-21l22-114h154l22 114q23 9 44.5 21t40.5 28l110-37 77 133-87 76q2 12 3 24t1 25q0 13-1 25t-3 24l87 76-77 133-110-37q-19 16-40.5 28T579-210L557-96H403Zm59-72h36l19-99q38-7 71-26t57-48l96 32 18-30-76-67q6-17 9.5-35.5T696-480q0-20-3.5-38.5T683-554l76-67-18-30-96 32q-24-29-57-48t-71-26l-19-99h-36l-19 99q-38 7-71 26t-57 48l-96-32-18 30 76 67q-6 17-9.5 35.5T264-480q0 20 3.5 38.5T277-406l-76 67 18 30 96-32q24 29 57 48t71 26l19 99Zm18-168q60 0 102-42t42-102q0-60-42-102t-102-42q-60 0-102 42t-42 102q0 60 42 102t102 42Zm0-144Z"/>
                 </svg>
             </div>
-            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-300 cursor-pointer hover:bg-slate-200">
+            <div id="help" class="w-8 h-8 rounded-full flex items-center justify-center bg-slate-300 cursor-pointer hover:bg-slate-200">
                 <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000000">
                     <path d="M480-240q20 0 34-14t14-34q0-20-14-34t-34-14q-20 0-34 14t-14 34q0 20 14 34t34 14Zm-36-153h73q0-37 6.5-52.5T555-485q35-34 48.5-58t13.5-53q0-55-37.5-89.5T484-720q-51 0-88.5 27T343-620l65 27q9-28 28.5-43.5T482-652q28 0 46 16t18 42q0 23-15.5 41T496-518q-35 32-43.5 52.5T444-393Zm36 297q-79 0-149-30t-122.5-82.5Q156-261 126-331T96-480q0-80 30-149.5t82.5-122Q261-804 331-834t149-30q80 0 149.5 30t122 82.5Q804-699 834-629.5T864-480q0 79-30 149t-82.5 122.5Q699-156 629.5-126T480-96Zm0-72q130 0 221-91t91-221q0-130-91-221t-221-91q-130 0-221 91t-91 221q0 130 91 221t221 91Zm0-312Z"/>
                 </svg>
             </div>
         </div>
-        <div class="w-full h-full px-3 space-y-6 mt-6">
+        
+        <div id="content" class="w-full h-full px-3 space-y-6 mt-6">
 
-            <!-- Selection Panel -->
-            <div class="w-full h-8 rounded-2xl text-white text-sm font-bold bg-orange-400 flex divide-x-[1px]">
-                <div id="normalMod" class="w-1/3 flex justify-center items-center cursor-pointer hover:bg-orange-300 hover:rounded-l-2xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#ffffff">
-                        <path d="m312-397 85-107h169L312-712v315ZM537-96 399-391 240-192v-672l528 432H486l138 295-87 41ZM397-504Z"/>
-                    </svg>
-                </div>
-                <div id="markingMod" class="w-1/3 flex justify-center items-center cursor-pointer hover:bg-orange-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e8eaed">
-                        <path d="M247-139q-45 0-84.5-20.5T96-215q31-2 53-23t22-52q0-48 33.15-80.5 33.14-32.5 80.5-32.5 47.35 0 79.85 32.96Q397-337.08 397-290q0 63-43.5 107T247-139Zm0-67q34.65 0 59.33-24.68Q331-255.35 331-290q0-19-13.5-32.5T285-336q-19 0-32.5 13.5T239-290q0 22-5 42.5T215-211q8 2 16 3.5t16 1.5Zm236-170L381-478l319-319q14-14 34-14t34 14l34 34q14 14.45 14 33.73Q816-710 802-696L483-376Zm-199 86Z"/>
-                    </svg>
-                </div>
-                <div id="eraserMod" class="w-1/3 flex justify-center items-center cursor-pointer hover:bg-orange-300 hover:rounded-r-2xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#e8eaed">
-                        <path d="M672-264h192v72H600l72-72Zm-437 72L117-310q-21-21-21.5-50.5T117-412l431-431q22-22 51-22t51.27 22.27L843-650q21 21 21.5 50.5T843-548L487-192H235Zm222-72 335-335-193-193-431 431 97 97h192Zm23-216Z"/>
-                    </svg>
-                </div>
-            </div>
-
-            <div>
-                <p class="text-sm">Opacity</p>
-                <div class="flex space-x-3">
-                    <input class="cursor-pointer" type="range" name="opacityValue" id="opacityRange" min="0" max="100" value="80">
-                    <span class="text-sm" id="opacityValueSpan">0.8</span>
-                </div>
-            </div>
-         
-            <div class="w-full border-2 rounded-2xl divide-y-[1px]">
-                <div class="w-full h-8 flex pl-2 items-center">
-                    <p class="text-sm">Marker Color</p>
-                </div>
-                <div class="w-full h-auto py-2 px-2">
-                    <div class="w-auto grid grid-cols-6 gap-2">
-                        <div class="w-full h-full flex justify-center items-center">
-                            <div id="yellowCell" class="w-8 h-8 rounded-full border-[3px] cursor-pointer ease-linear hover:border-blue-400 bg-yellow-300 colorcell"></div>
-                        </div>
-                        <div class="w-full h-full flex justify-center items-center">
-                            <div id="redCell" class="w-8 h-8 rounded-full border-[3px] cursor-pointer ease-linear hover:border-blue-400 bg-red-600 colorcell"></div>
-                        </div>
-                        <div class="w-full h-full flex justify-center items-center">
-                            <div id="orangeCell" class="w-8 h-8 rounded-full border-[3px] cursor-pointer ease-linear hover:border-blue-400  bg-orange-600 colorcell"></div>
-                        </div>
-                        <div class="w-full h-full flex justify-center items-center">
-                            <div id="blueCell" class="w-8 h-8 rounded-full border-[3px] cursor-pointer ease-linear hover:border-blue-300 bg-blue-600 colorcell"></div>
-                        </div>
-                        <div class="w-full h-full flex justify-center items-center">
-                            <div id="greenCell" class="w-8 h-8 rounded-full border-[3px] cursor-pointer ease-linear hover:border-blue-400 bg-green-600 colorcell"></div>
-                        </div>
-                        <div class="w-full h-full flex justify-center items-center">
-                            <div id="purpleCell" class="w-8 h-8 rounded-full border-[3px] cursor-pointer ease-linear hover:border-blue-400 bg-purple-600 colorcell"></div>
-                        </div>
-                        <div class="w-full h-full flex justify-center items-center">
-                            <div id="pinkCell" class="w-8 h-8 rounded-full border-[3px] cursor-pointer ease-linear hover:border-blue-400 bg-pink-600 colorcell"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="w-full h-auto border-2 rounded-2xl divide-y-[1px]">
-                <div class="w-full h-8 flex pl-2 items-center">
-                    <p class="text-sm">Marked Texts</p>
-                </div>
-                <div class="w-full h-80">
-                    <div class="">
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- <div id="saveButton" class="bg-blue-400 w-20 h-8 flex items-center justify-center text-sm text-white rounded-2xl cursor-pointer">Button</div> -->
+            <!-- Content will load in here -->
 
             
         </div>
-        <footer class="w-full fixed bottom-0 py-3 flex justify-center border-t-2">
+
+        <footer class="w-full fixed bottom-0 py-3 flex flex-col items-center  border-t-2">
             <div class="">
                 <p><span id="year"></span>&copy; Dino Marker. All rights are reserved.</p>
             </div>
+            <p class="text-gray-400" style="font-size: 10px;">V1.0.0</p>
         </footer>
-        <script src="/scripts/sidepanel.js"></script>
+        <script src="/scripts/load.js"></script>
     </body>
 </html>

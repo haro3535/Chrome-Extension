@@ -1,3 +1,7 @@
+// This file is used for the sidepanel
+// Basically, it contains main functions of the sidepanel like menu action, content loading, and script appending.
+
+
 
 window.onload = loadContent("home");
 
@@ -27,14 +31,17 @@ async function loadContent(fileName) {
         console.error('Error loading content:', error);
     }
 }
+// 'home' is initial state
+let currentPage = 'home';
 
-function removeContent(srciptID) {
+// Removes all the elements inside the 'content' div which is used for present the components inside
+function removeContent() {
     try{
-        document.getElementById(`sp_${srciptID}`).remove();
-        let numOfChild = document.getElementById('content').childElementCount;
-        for (let index = 0; index < numOfChild; index++) {
-            // Burada contentin içideki çocukları kaldırman lazım ya da html elemetnlerıne düzenleme getir tek çocuk olsun
-            
+        document.getElementById(`sp_${currentPage}`).remove();
+        
+        let element = document.getElementById('content');
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
         }
     }
     catch (error) {
@@ -42,15 +49,21 @@ function removeContent(srciptID) {
     }
 }
 
+
+// Menu buttons listiners
 document.getElementById('home').addEventListener('click', () => {
-    removeContent('home');
+    removeContent();
     loadContent('home');
+    currentPage = 'home';
 })
 document.getElementById('settings').addEventListener('click', () => {
-    removeContent('settings').then(() => loadContent('settings'));
+    removeContent();
+    loadContent('settings');
+    currentPage = 'settings';
 })
 
 document.getElementById('help').addEventListener('click', () => {
-    removeContent('help');
+    removeContent();
     loadContent('help');
+    currentPage = 'help';
 })

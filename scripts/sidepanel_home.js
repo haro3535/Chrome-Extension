@@ -36,7 +36,7 @@ document.getElementById('eraserMod').addEventListener('click', () => {
         action: 'changeCursor',
         cursorMod: 'eraser'
     })
-    clickedItem(document.getElementById('erazerMod'));
+    clickedItem(document.getElementById('eraserMod'));
 })
 
 
@@ -65,7 +65,6 @@ for (let index = 0; index < colorCells.length; index++) {
  */
 function clickedItem(element){
     document.getElementById("selectionPanel").querySelectorAll('div').forEach(item => {
-        console.log(item);
         if(item.id == element.id){
             item.style.backgroundColor = "#cbd5e1";
         }

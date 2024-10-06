@@ -1,11 +1,13 @@
 
 // Set the year
-document.getElementById("year").textContent = new Date().getFullYear();
+// document.getElementById("year").textContent = new Date().getFullYear();
 
-let opacitySpan = document.getElementById('opacityValueSpan');
+if (typeof opacitySpan1 === 'undefined') {
+    var opacitySpan1 = document.getElementById('opacityValueSpan');
+}
 
 document.getElementById('opacityRange').addEventListener('input', (event) => {
-    opacitySpan.innerHTML = event.target.value / 100;
+    opacitySpan1.innerHTML = event.target.value / 100;
 })
 
 document.getElementById('opacityRange').addEventListener('change', (event) => {
@@ -40,7 +42,9 @@ document.getElementById('eraserMod').addEventListener('click', () => {
 })
 
 
-const colorCells = document.getElementsByClassName("colorcell");
+if (typeof colorCells === 'undefined') {
+    var colorCells = document.getElementsByClassName("colorcell");
+}
 colorCells[0].style.borderColor = "rgb(96,165,250)";
 
 for (let index = 0; index < colorCells.length; index++) {
@@ -82,9 +86,3 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
         // Buraya sidepanelde gösterilecek mesajların okunmasını ekle
     }
 })
-
-
-
-
-
-

@@ -7,13 +7,13 @@
       "email": "harunonur.ho@gmail.com",
       "website": "https://www.harunonur.com/"
     },
-    "version": "1.0",
+    "version": "1.0.0",
     "action": {
       "default_popup": "/popup/popup.html",
       "default_icon": "hello_extensions.png"
     },
     "permissions": [
-      "sidePanel", "activeTab", "tabs"
+      "sidePanel", "activeTab", "tabs","declarativeContent"
     ],
     "side_panel": {
       "default_path": "/sidepanel/sidepanel.html"
@@ -26,10 +26,18 @@
       {
         "js": ["content.js"],
         "css": ["marker.css"],
-        "matches": [
-          "http://*/*", 
-          "https://*/*"
-        ]
+        "matches": ["<all_urls>"],
+        "type": "module"
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "images/mycursor16x16.png",
+          "images/mycursor32x32.png",
+          "images/eraser.png"
+        ],
+        "matches": ["<all_urls>"]
       }
     ]
   }

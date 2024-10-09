@@ -18,9 +18,12 @@ chrome.runtime.onInstalled.addListener(() => {
         })
       });
     }
-
-    if (message.action === 'changeCursor') {
-      console.log('selam')
+    else if (message.action === 'changeSidePanelView') {
+      chrome.sidePanel.setOptions({
+        
+      })
+    }
+    else if (message.action === 'changeCursor') {
       chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: 'changeCursor',
@@ -28,8 +31,7 @@ chrome.runtime.onInstalled.addListener(() => {
         });
       });
     }
-
-    if (message.action === 'changeOpacity') {
+    else if (message.action === 'changeOpacity') {
       chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
         chrome.tabs.sendMessage(tabs[0].id, {
           action: 'changeOpacity',
@@ -37,4 +39,16 @@ chrome.runtime.onInstalled.addListener(() => {
         });
       });
     }
+    else if (message.action === 'changeColor') {
+      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'changeColor',
+          color: message.color
+        });
+      });
+    }
+    else if (message.action === 'openLink') {
+      chrome.tabs.create({ url: message.url });
+    }
+
   });

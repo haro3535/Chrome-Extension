@@ -1,36 +1,57 @@
-
-// Cursor Mods: normal, marker
+// Cursor Mods: normal, marker, eraser?
 let cursorMod = 'normal';
 
-let opacity = 0.5;
-let color = `rgba(255,212,101,${opacity})`;
+let alpha = 0.8
+let color = `rgba(255,212,101,${alpha})`;
 
 let style = null;
-
+let newContentFlag = false;
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     if (message.action === 'changeCursor'){
         cursorMod = message.cursorMod.toString();
         if (cursorMod == "marker") {
-            // Burasi calismiyor 
             console.log("marker");
+            if (document.body.style.getPropertyValue('cursor') != null || document.body.style.getPropertyValue('cursor') != undefined) {
+                document.body.style.removeProperty('cursor');
+            }
+            
             appendStyle();
             
         }
-        else {
+        else if (cursorMod == "cursor"){
             console.log("cursor");
             if(style != null)
             {
-                
                 document.head.removeChild(style);
                 style = null;
             }
+            else document.body.style.cursor = `auto`;
         }
-                
+        else {
+            console.log("eraser");
+            if(style != null)
+            {
+                document.head.removeChild(style);
+                document.body.style.cursor = `url(${chrome.runtime.getURL("images/eraser.png")}), auto`;
+                style = null;
+            }
+            else{
+                document.body.style.cursor = `url(${chrome.runtime.getURL("images/eraser.png")}), auto`;
+            }
+        }      
     }
-    if (message.action === 'changeOpacity'){
-        opacity = message.opacityValue;
-        color = `rgba(255,212,101,${opacity})`
+    else if (message.action === 'changeOpacity'){
+        alpha = message.opacityValue;
+        let rgbComponents = color.match(/\d+/g);
+        color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
+        appendStyle();
+    }
+    else if (message.action === 'changeColor'){
+        console.log(message.color);
+        let rgbComponents = message.color.match(/\d+/g);
+        color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
+        appendStyle();
     }
   });
 
@@ -44,6 +65,9 @@ function appendStyle(){
             }
             ::-moz-selection {
                 background-color: ${color};
+            }
+            body {
+                cursor: url(${chrome.runtime.getURL("images/mycursor16x16.png")}), auto;
             }
         `;
         document.head.appendChild(style);
@@ -66,6 +90,7 @@ let selectedText = ""; // Variable to store selected text
         if (cursorMod == 'marker')
             selectedText = getSelectedText(window.getSelection());
         //  clearHighlights();
+
     });
 
     // Event listener for mouse up
@@ -75,18 +100,16 @@ let selectedText = ""; // Variable to store selected text
             return;
 
         if (cursorMod == 'marker') {
-            
-            // It returns if ancor and focus is same
             let selection = window.getSelection();
-            //console.log(selection.getRangeAt(0))
-
-            // if (selection.isCollapsed)
-            //     return
-
             myHighlightFunction()
 
             selection.removeAllRanges();
+        }
 
+        if (cursorMod == 'eraser') {
+            let selection = window.getSelection();
+            console.log(selection.anchorNode);
+            deleteHighlite(selection.anchorNode);
         }
     });
 
@@ -150,80 +173,130 @@ let selectedText = ""; // Variable to store selected text
     }
 
 
-
+    // Main function 
 
     function myHighlightFunction() {
 
         let selection = window.getSelection();
-
-        let ancorNode = selection.anchorNode;
+        let anchorNode = selection.anchorNode;
         let anchorOffset = selection.anchorOffset;
         let focusNode = selection.focusNode;
         let focusOffset = selection.focusOffset;
 
-
-        if (ancorNode === focusNode){
-            highlightSelectedText();
+        if (anchorNode === focusNode){
+            highlight(anchorNode,anchorOffset,focusOffset);
         }
         else {
             let commonAncestorContainer = selection.getRangeAt(0).commonAncestorContainer;
             console.log(commonAncestorContainer);
-            // TODO: Buradana devam tüm çocuk elementlere kadar ulaşıcan taki focuse nodu bulana kadar
-            let anchorParentNode = ancorNode.parentNode;
-            let focusParentNode = focusNode.parentNode;
+            
 
-            let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, ancorNode);
-            let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
-            console.log("Starter Node: " + starterNodeIndex);
-            console.log("End Node: " + endNodeIndex);
+            if(checkDependencyOfNodes(anchorNode,focusNode)){
+                // Check if anchor and focus nodes are siblings
+                let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
 
-            if (starterNodeIndex < endNodeIndex){
+                if (starterNodeIndex < endNodeIndex){
+                    highlight(anchorNode,anchorOffset,anchorNode.length);
 
-                let tIndex = starterNodeIndex + 1;
-                while (tIndex != endNodeIndex){
-                    traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
-                    console.log("Buraya geldimmm");
-                    tIndex++;
+                    let tIndex = starterNodeIndex + 1;
+                    while (tIndex != endNodeIndex){
+                        let copyChildNodes = commonAncestorContainer.childNodes;
+                        traversRootFromTopToBottom(copyChildNodes[tIndex]);
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                        tIndex++;
+                    }
+
+                    highlight(focusNode,0,focusOffset);
                 }
-                
-                highlight(ancorNode,anchorOffset,ancorNode.length);
-        
-                horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'l', ancorNode);
-                horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'r', focusNode);
-                
-                highlight(focusNode,0,focusOffset);
+                else{
+                    highlight(anchorNode,0,anchorOffset);
+
+                    let tIndex = endNodeIndex + 1;
+                    while (tIndex != starterNodeIndex){
+                        traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                        tIndex++;
+                    }
+
+                    highlight(focusNode,focusOffset,focusNode.length);
+                }
             }
-            else if (starterNodeIndex > endNodeIndex){
-                let tIndex = endNodeIndex + 1;
-                while (tIndex != starterNodeIndex){
-                    traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
-                    tIndex++;
+            else {
+                // They are not siblings
+                let starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                let endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+
+                if (starterNodeIndex < endNodeIndex){
+
+                    highlight(anchorNode,anchorOffset,anchorNode.length);
+
+                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'n', anchorNode);
+
+                    let tIndex = starterNodeIndex + 1; // 2 comes from to call next node after the start node
+                    while (tIndex != endNodeIndex){
+                        let copyChildNodes = commonAncestorContainer.childNodes;
+                        traversRootFromTopToBottom(copyChildNodes[tIndex]);
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                        tIndex++;
+                    }
+                    
+                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'p', focusNode);
+                    
+                    highlight(focusNode,0,focusOffset);
+                    
+                    
                 }
+                else if (starterNodeIndex > endNodeIndex){
+                    debugger;
 
-                //highlight(ancorNode,anchorOffset,ancorNode.length);
+                    highlight(focusNode,focusOffset,focusNode.length);
 
-                horizontalStepFunction(ancorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'r', ancorNode);
-                horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'l', focusNode);
-                
-                //highlight(focusNode,0,focusOffset);
+                    horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'n', focusNode);
+
+                    let tIndex = endNodeIndex + 1; // 2 comes from to call next node after the start node
+                    while (tIndex != starterNodeIndex){
+                        let copyChildNodes = commonAncestorContainer.childNodes;
+                        traversRootFromTopToBottom(copyChildNodes[tIndex]);
+                        starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                        endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                        tIndex++;
+                    }
+
+                    horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'p', anchorNode);
+                    
+                    highlight(anchorNode,0,anchorOffset);
+
+                    // highlight(anchorNode,0,anchorOffset);
+
+                    // horizontalStepFunction(anchorNode, commonAncestorContainer.childNodes[starterNodeIndex], 'p', anchorNode);
+
+                    // let tIndex = endNodeIndex + 1;
+                    // while (tIndex != starterNodeIndex){
+                    //     traversRootFromTopToBottom(commonAncestorContainer.childNodes[tIndex]);
+                    //     starterNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, anchorNode);
+                    //     endNodeIndex = findSelectedChildofRootElement(commonAncestorContainer, focusNode);
+                    //     tIndex++;
+                    // }
+    
+                    
+                    // highlight(focusNode,focusOffset,focusNode.length);
+    
+                    // // TODO: Sıkıntı var
+                    
+                    // horizontalStepFunction(focusNode, commonAncestorContainer.childNodes[endNodeIndex], 'n', focusNode);
+                    
+                    
+                }
             }
         }
     }
 
-    /**
-     * @param {Node} commonAncestorContainer
-     * @param {Node} node
-     */
-    function findSelectedChildofRootElement(commonAncestorContainer, node){
 
-        
-        let currentElement = node;
-        while (currentElement.parentElement !== commonAncestorContainer){
-            currentElement = currentElement.parentElement;
-        }
-
-        return Array.prototype.indexOf.call(commonAncestorContainer.childNodes, currentElement);
-    }
+    
 
 
     // Travers through top to bottom (for the sibling parrent nodes that are between start parent node and end parent node)
@@ -231,60 +304,27 @@ let selectedText = ""; // Variable to store selected text
      * @param {Node} node
      */
     function traversRootFromTopToBottom(node){
-
+        
         if (node == null)
             return;
 
-        //console.log("Node Type: " + node);
-
-        if (node.nodeType === Node.TEXT_NODE && node.nodeValue != ""){
-            console.log(node);
+        // Check if the current node is a text node
+        if (node.nodeType === Node.TEXT_NODE) {
+            if (node.textContent.trim().length == 0){
+                node.parentElement.removeChild(node);
+                return;
+            }
+                 
+            console.log("Text node found:", node.nodeValue);      
             highlight(node, 0, node.length);
-            return;
-        }
-        
-        if (node.hasChildNodes() && node.nodeType !== Node.TEXT_NODE)
-        {
-            console.log("Node Type: " + node);
-            console.log("Has Child: " + node.hasChildNodes());
-            console.log("Childs" + node.childNodes.length);
-
-            let childNumber = node.childNodes.length;
-
-            if (childNumber == 1)
-                traversRootFromTopToBottom(node.childNodes[0]);
-            else if (childNumber > 1)
-            node.childNodes.forEach(child => {
-                traversRootFromTopToBottom(child);
-            })
-        }
-    }
-
-    /**
-     * @param {Node} node
-     * @param {Node} targetNode 
-     * @param {*} direction
-     */
-    function elevateBottomtoTop(node, targetNode, direction){
-
-        
-
-        if (node === targetNode || node === null)
-            return null;
-
-
-        // Yukari dogru gitmeden once verilen dogrultuda kardeslerini tariyor
-        let currentSibling = node;
-        while(currentSibling != null){
-            if(direction == 'l')
-                currentSibling = currentSibling.nextSibling;
-            else if (direction == 'r')
-                currentSibling = currentSibling.previousSibling;
-            traversRootFromTopToBottom(currentSibling);
+            return; // Stop further traversal
         }
 
-        elevateBottomtoTop(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction);
-             
+        // Ensure the node has child nodes before trying to traverse them
+        if (node.hasChildNodes()) {
+            node.childNodes.forEach(child => traversRootFromTopToBottom(child));
+        }
+        else return;
     }
 
     /**
@@ -298,28 +338,28 @@ let selectedText = ""; // Variable to store selected text
         if (node === targetNode)
             return;
 
-        if (direction == 'l'){
+        if (direction == 'n'){
             
             // Burada next sibling null ise sıkıntı çıkmasın diye yapıyorum
-            let nextSibling = node.nextSibling;
-            if (nextSibling != null){
+            if (node.nextSibling != null && node.nextSibling != undefined){
+                let nextSibling = node.nextSibling;
                 if(node != startEnd)
                     traversRootFromTopToBottom(nextSibling);
                 horizontalStepFunction(nextSibling, targetNode, direction, null);
             }
             else 
-                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, null);
+                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, startEnd);
         }
-        else if (direction == 'r'){
+        else if (direction == 'p'){
             // Burada previous sibling null ise sıkıntı çıkmasın diye yapıyorum
-            let prevSibling = node.previousSibling;
-            if (prevSibling != null){
+            if (node.previousSibling != null && node.previousSibling != undefined){
+                let prevSibling = node.previousSibling;
                 if(node != startEnd)
                     traversRootFromTopToBottom(prevSibling);
                 horizontalStepFunction(prevSibling, targetNode, direction, null);
             }
             else 
-                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, null);
+                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, startEnd);
         }
         else 
         {
@@ -334,19 +374,21 @@ let selectedText = ""; // Variable to store selected text
      * @param {*} direction
      */
     function findUpperParentWhichIsHaveNotNullSibling(node, targetNode, direction){
-
-
+        // FIXME: Bu fonksiyonda hata var
+        
         if (node === targetNode)
             return targetNode;
         
-        if(direction == 'l')
+        if(direction == 'n')
             if (node.nextSibling != null)
                 return node.nextSibling;
-        else if (direction == 'r')
-            if (node.previousSibling != null)
+        else if (direction == 'p')
+            if (node.previousSibling != null) // FIXME: Check here later. There is a problem occured.
                 return node.previousSibling;
-
-        return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
+        
+        if(node.parentElement != null)
+           return findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction);
+        else return; 
     }
 
     // Highlites current node
@@ -357,13 +399,19 @@ let selectedText = ""; // Variable to store selected text
      */
     function highlight(node, startOffset, endOffset){
 
-        console.log(startOffset, endOffset);
+        // console.log(startOffset, endOffset);
 
+        if (startOffset > endOffset) {
+            // Swap the values if they are in reverse order
+            [startOffset, endOffset] = [endOffset, startOffset];
+        }
+    
         const range = document.createRange();
         range.setStart(node, startOffset);
         range.setEnd(node, endOffset);
+        
 
-        console.log(range);
+        console.log(color);
 
         var span = document.createElement('span');
             span.className = 'highlight';
@@ -371,13 +419,18 @@ let selectedText = ""; // Variable to store selected text
         range.surroundContents(span);
 
         window.getSelection().removeAllRanges();
+
+        deleteUnwantedTextElements(span);
+
     }
 
 
-
-
-
-
+    function checkNewContentFlagIsRised(){
+        if(newContentFlag){
+            newContentFlag = false;
+            return true;
+        }else return false;
+    }
 
 
 /**
@@ -428,3 +481,109 @@ function saveHiglighting(element, startOffset, endOffset) {
     
 }  
 
+
+
+
+
+
+
+
+ 
+
+/**
+     * @param {Node} anchorNode
+     * @param {Node} focusNode 
+     */
+function checkDependencyOfNodes(anchorNode, focusNode) {
+    // There are two situation:
+    //  1) Ancor node and focus node are not siblings.
+    //  2) They are siblings.
+    //
+    // These situations causes futer problem while computing.
+    // This function finds that given nodes (anchor and focus) are siblings (dependent) or not.
+    
+    if(anchorNode != null || anchorNode !== undefined){
+        let parent = anchorNode.parentNode;
+        if(parent != null || parent != undefined){
+            for (let child of parent.childNodes) {
+                console.log("object");
+                if (child === focusNode) {
+                    return true; // They are dependent
+                }
+            }
+            return false; // They are independent
+        }
+        throw new Error("Parent element is null or undefined!"); 
+    }
+    else throw new Error("Anchor element is null or undefined!"); 
+}
+
+/**
+ * 
+ * @param {Node} spanNode 
+ */
+function deleteUnwantedTextElements(spanNode){
+    
+    try {
+        if(spanNode.previousSibling != null && spanNode.previousSibling.nodeType == Node.TEXT_NODE && spanNode.previousSibling.textContent == ""){
+            if (spanNode.parentElement != null)
+                spanNode.parentElement.removeChild(spanNode.previousSibling);
+        }
+
+        if(spanNode.nextSibling != null && spanNode.nextSibling.nodeType == Node.TEXT_NODE && spanNode.nextSibling.textContent == ""){
+            if (spanNode.parentElement != null)
+                spanNode.parentElement.removeChild(spanNode.nextSibling);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+/**
+ * 
+ * @param {Node} node 
+ */
+function findTheIndexOfCurrentNode(node){
+    debugger;
+    if (node.parentElement != null){
+        let parent = node.parentElement;
+        for (let index = 0; index < parent.childNodes.length; index++) {
+            if(parent.childNodes.item(index) === node)
+                return index;
+        }
+        return -1;
+    }
+    else return 0;
+}
+
+/**
+     * @param {Node} commonAncestorContainer
+     * @param {Node} node
+     */
+function findSelectedChildofRootElement(commonAncestorContainer, node){
+    // This function finds sibling nodes that are contains selected TEXT nodes
+    // that are under the commonAncestorContainer node.
+    
+    let currentElement = node;
+    while (currentElement.parentElement !== commonAncestorContainer){
+        currentElement = currentElement.parentElement;
+    }
+    console.log(currentElement);
+
+    return Array.prototype.indexOf.call(commonAncestorContainer.childNodes, currentElement);
+}
+
+
+/**
+ * 
+ * @param {HTMLElement} node 
+ */
+function deleteHighlite(node) {
+    if (node.parentElement.classList.contains("highlight")) {
+        let parent = node.parentElement;
+        while (parent.firstChild) {
+            parent.parentNode.insertBefore(parent.firstChild, parent);
+        }
+        parent.parentNode.removeChild(parent);
+    }
+}

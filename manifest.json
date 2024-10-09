@@ -34,7 +34,8 @@
       {
         "resources": [
           "images/mycursor16x16.png",
-          "images/mycursor32x32.png"
+          "images/mycursor32x32.png",
+          "images/eraser.png"
         ],
         "matches": ["<all_urls>"]
       }

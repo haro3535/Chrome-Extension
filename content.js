@@ -11,8 +11,11 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     if (message.action === 'changeCursor'){
         cursorMod = message.cursorMod.toString();
         if (cursorMod == "marker") {
-            // Burasi calismiyor 
             console.log("marker");
+            if (document.body.style.getPropertyValue('cursor') != null || document.body.style.getPropertyValue('cursor') != undefined) {
+                document.body.style.removeProperty('cursor');
+            }
+            
             appendStyle();
             
         }
@@ -23,13 +26,18 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
                 document.head.removeChild(style);
                 style = null;
             }
+            else document.body.style.cursor = `auto`;
         }
         else {
             console.log("eraser");
             if(style != null)
             {
                 document.head.removeChild(style);
+                document.body.style.cursor = `url(${chrome.runtime.getURL("images/eraser.png")}), auto`;
                 style = null;
+            }
+            else{
+                document.body.style.cursor = `url(${chrome.runtime.getURL("images/eraser.png")}), auto`;
             }
         }      
     }
@@ -570,10 +578,12 @@ function findSelectedChildofRootElement(commonAncestorContainer, node){
  * 
  * @param {HTMLElement} node 
  */
-function deleteHighlite(node){
-
-    if(node.parentElement.classList.contains("highlight")){
-        // TODO: Direk böyle olmuyor yazıyıda kaldırıyor
-        node.parentElement.remove();
+function deleteHighlite(node) {
+    if (node.parentElement.classList.contains("highlight")) {
+        let parent = node.parentElement;
+        while (parent.firstChild) {
+            parent.parentNode.insertBefore(parent.firstChild, parent);
+        }
+        parent.parentNode.removeChild(parent);
     }
 }

@@ -40,22 +40,22 @@ Harun's Extension is a Chrome extension designed to provide a text marker functi
 
 ### Project Structure
 
-- **background.js**: Handles background tasks and message passing.
-- **content.js**: Contains content scripts for interacting with web pages.
-- **popup/**: Contains HTML and JavaScript files for the popup interface.
-- **sidepanel/**: Contains HTML and JavaScript files for the side panel.
-- **scripts/**: Contains additional JavaScript files for various functionalities.
-- **styles/**: Contains CSS files for styling the extension.
+- **background.js**: This file is responsible for handling background tasks and message passing between different parts of the extension. It runs in the background and listens for events such as browser actions or messages from content scripts.
+- **content.js**: This script is injected into web pages and interacts with the DOM of the page. It contains the logic for marking text and communicating with the background script.
+- **popup/**: This directory contains the HTML and JavaScript files for the popup interface that appears when the extension icon is clicked. It includes files like `popup.html` and `popup.js`.
+- **sidepanel/**: This directory holds the HTML and JavaScript files for the side panel, which provides additional settings and help options. It includes files like `sidepanel.html` and `sidepanel.js`.
+- **scripts/**: This directory contains additional JavaScript files that provide various functionalities required by the extension. Examples include `popup.js` and `load.js`.
+- **styles/**: This directory contains CSS files used for styling the extension's popup and side panel interfaces.
 
 ### Scripts
 
-- **popup.js**: Handles events and actions in the popup interface ([popup.js](scripts/popup.js)).
-- **load.js**: Manages content loading and script appending in the side panel ([load.js](scripts/load.js)).
+- **popup.js**: This script handles events and actions within the popup interface. It manages user interactions such as signing in and starting the marking process. The file can be found at `scripts/popup.js`.
+- **load.js**: This script is responsible for managing content loading and appending scripts in the side panel. It ensures that the necessary scripts are loaded when the side panel is opened. The file can be found at `scripts/load.js`.
 
 ### Configuration
 
-- **manifest.json**: Defines the extension's metadata and permissions ([manifest.json](manifest.json)).
-- **tailwind.config.js**: Configures Tailwind CSS for styling ([tailwind.config.js](tailwind.config.js)).
+- **manifest.json**: This file defines the extension's metadata, permissions, and other configurations. It specifies details such as the extension's name, version, icons, and the permissions it requires to function. The file can be found at `manifest.json`.
+- **tailwind.config.js**: This file configures Tailwind CSS for styling the extension. It allows customization of the default Tailwind CSS settings to fit the design requirements of the extension. The file can be found at `tailwind.config.js`.
 
 ## License
 

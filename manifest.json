@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Harun's Extension",
+    "name": "Dino Marker Extension",
     "description": "Text Marker",
     "author": {
       "name": "Harun Onur",
@@ -10,10 +10,10 @@
     "version": "1.0.0",
     "action": {
       "default_popup": "/popup/popup.html",
-      "default_icon": "hello_extensions.png"
+      "default_icon": "/images/dino_favicon_64x64.png"
     },
     "permissions": [
-      "sidePanel", "activeTab", "tabs","declarativeContent"
+      "sidePanel", "activeTab", "tabs","declarativeContent","storage"
     ],
     "side_panel": {
       "default_path": "/sidepanel/sidepanel.html"

@@ -15,7 +15,7 @@ Dino Marker Extension is a Chrome extension designed to provide a text marker fu
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/Chrome-Extension.git
+    git clone https://github.com/haro3535/Chrome-Extension.git
     ```
 2. Navigate to the project directory:
     ```sh

@@ -7,6 +7,32 @@ let color = `rgba(255,212,101,${alpha})`;
 let style = null;
 let newContentFlag = false;
 
+const preferences = {
+    color: `rgba(255,212,101,${alpha})`,
+    opacity: alpha
+}
+
+// Save user data
+function saveUserData(data) {
+    chrome.storage.sync.set({ preferences: data }, function() {
+      console.log('Preferences saved.');
+    });
+  }
+
+  // Retrieve user data
+function getUserData(callback) {
+    chrome.storage.sync.get(['userData'], function(result) {
+      console.log('User data retrieved:', result.userData);
+      callback(result.userData);
+    });
+  }
+  
+  // Example usage
+  getUserData(function(data) {
+    console.log('User preferences:', data);
+    preferences = data;
+  });
+
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     if (message.action === 'changeCursor'){
         cursorMod = message.cursorMod.toString();

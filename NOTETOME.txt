@@ -11,3 +11,6 @@ FIXED: Aşağıdan yukarı işaretlemelerde hata çıkardı.
 
 25.09.2024
 Üst üste işaretlemede sıkıntı çıkardı.
+
+09.10.2024
+Aşağıdan yukarıya işaretlemede sıkıntı çıktı başladığım yerin sonrasını da alıyor.

@@ -12,28 +12,10 @@ const preferences = {
     opacity: alpha
 }
 
-// Save user data
-function saveUserData(data) {
-    chrome.storage.sync.set({ preferences: data }, function() {
-      console.log('Preferences saved.');
-    });
-  }
 
-  // Retrieve user data
-function getUserData(callback) {
-    chrome.storage.sync.get(['userData'], function(result) {
-      console.log('User data retrieved:', result.userData);
-      callback(result.userData);
-    });
-  }
-  
-  // Example usage
-  getUserData(function(data) {
-    console.log('User preferences:', data);
-    preferences = data;
-  });
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    // TODO: Burada cursor degisimini eraserdaki gibi yap.
     if (message.action === 'changeCursor'){
         cursorMod = message.cursorMod.toString();
         if (cursorMod == "marker") {
@@ -77,32 +59,80 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         console.log(message.color);
         let rgbComponents = message.color.match(/\d+/g);
         color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
-        appendStyle();
+        updateSelectionColor(color);
     }
   });
 
 
-function appendStyle(){
-    if (style == null){
+function updateSelectionColor(color) {
+    // Find or create a style element
+    let style = document.getElementById('dynamic-selection-style');
+    if (!style) {
         style = document.createElement('style');
-        style.innerHTML = `
-            ::selection {
-                background-color: ${color};
-            }
-            ::-moz-selection {
-                background-color: ${color};
-            }
-            body {
-                cursor: url(${chrome.runtime.getURL("images/mycursor16x16.png")}), auto;
-            }
-        `;
+        style.id = 'dynamic-selection-style';
         document.head.appendChild(style);
     }
-    else{
-        document.head.removeChild(style);
-        style = null;
-        appendStyle();
+
+    // Use the CSSStyleSheet API to add or update the ::selection rule
+    const sheet = style.sheet;
+    const rules = sheet.cssRules || sheet.rules;
+
+    // Remove existing ::selection rules if any
+    for (let i = rules.length - 1; i >= 0; i--) {
+        if (rules[i].selectorText === '::selection' || rules[i].selectorText === '::-moz-selection') {
+            sheet.deleteRule(i);
+        }
     }
+
+    // Add new ::selection rules
+    sheet.insertRule(`::selection { background-color: ${color}; }`, rules.length);
+    sheet.insertRule(`::-moz-selection { background-color: ${color}; }`, rules.length);
+}
+
+function updateCursor(cursorUrl) {
+    // Find or create a style element
+    if (!style) {
+        style = document.createElement('style');
+        style.id = 'dynamic-style-cursor';
+        document.head.appendChild(style);
+    }
+
+    // Use the CSSStyleSheet API to add or update the cursor rule
+    const sheet = style.sheet;
+    const rules = sheet.cssRules || sheet.rules;
+
+    // Remove existing cursor rules if any
+    for (let i = rules.length - 1; i >= 0; i--) {
+        if (rules[i].selectorText === 'body') {
+            sheet.deleteRule(i);
+        }
+    }
+
+    // Add new cursor rule
+    sheet.insertRule(`body { cursor: url(${cursorUrl}), auto; }`, rules.length);
+}
+
+function updateOpacity(opacity) {
+    // Find or create a style element
+    if (!style) {
+        style = document.createElement('style');
+        style.id = 'dynamic-style-opacity';
+        document.head.appendChild(style);
+    }
+
+    // Use the CSSStyleSheet API to add or update the opacity rule
+    const sheet = style.sheet;
+    const rules = sheet.cssRules || sheet.rules;
+
+    // Remove existing opacity rules if any
+    for (let i = rules.length - 1; i >= 0; i--) {
+        if (rules[i].selectorText === 'body') {
+            sheet.deleteRule(i);
+        }
+    }
+
+    // Add new opacity rule
+    sheet.insertRule(`body { opacity: ${opacity}; }`, rules.length);
 }
 
 let selectedText = ""; // Variable to store selected text

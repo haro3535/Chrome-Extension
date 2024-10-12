@@ -1,6 +1,26 @@
 
-// Set the year
-// document.getElementById("year").textContent = new Date().getFullYear();
+
+
+// Save user data
+function saveUserData(data) {
+    chrome.storage.sync.set({ preferences: data }, function() {
+      console.log('Preferences saved.');
+    });
+  }
+
+  // Retrieve user data
+function getUserData(callback) {
+    chrome.storage.sync.get(['userData'], function(result) {
+      console.log('User data retrieved:', result.userData);
+      callback(result.userData);
+    });
+  }
+  
+  // Example usage
+  getUserData(function(data) {
+    console.log('User preferences:', data);
+    preferences = data;
+  });
 
 if (typeof opacitySpan1 === 'undefined') {
     var opacitySpan1 = document.getElementById('opacityValueSpan');

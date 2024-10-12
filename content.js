@@ -18,48 +18,38 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     // TODO: Burada cursor degisimini eraserdaki gibi yap.
     if (message.action === 'changeCursor'){
         cursorMod = message.cursorMod.toString();
+
+        let colorStyle = document.getElementById('dynamic-selection-style');
         if (cursorMod == "marker") {
             console.log("marker");
-            if (document.body.style.getPropertyValue('cursor') != null || document.body.style.getPropertyValue('cursor') != undefined) {
-                document.body.style.removeProperty('cursor');
-            }
-            
-            appendStyle();
+             
+            updateCursor(chrome.runtime.getURL("images/mycursor16x16.png"));
+            updateSelectionColor(color);
             
         }
         else if (cursorMod == "cursor"){
             console.log("cursor");
-            if(style != null)
-            {
-                document.head.removeChild(style);
-                style = null;
-            }
-            else document.body.style.cursor = `auto`;
+            updateCursor("auto");
+            if(colorStyle != null)
+                document.head.removeChild(colorStyle);
         }
         else {
             console.log("eraser");
-            if(style != null)
-            {
-                document.head.removeChild(style);
-                document.body.style.cursor = `url(${chrome.runtime.getURL("images/eraser.png")}), auto`;
-                style = null;
-            }
-            else{
-                document.body.style.cursor = `url(${chrome.runtime.getURL("images/eraser.png")}), auto`;
-            }
+            
+            updateCursor(chrome.runtime.getURL("images/eraser.png"));
+            if(colorStyle != null)
+                document.head.removeChild(colorStyle);
         }      
     }
     else if (message.action === 'changeOpacity'){
         alpha = message.opacityValue;
         let rgbComponents = color.match(/\d+/g);
         color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
-        appendStyle();
     }
     else if (message.action === 'changeColor'){
         console.log(message.color);
         let rgbComponents = message.color.match(/\d+/g);
         color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
-        updateSelectionColor(color);
     }
   });
 
@@ -91,6 +81,7 @@ function updateSelectionColor(color) {
 
 function updateCursor(cursorUrl) {
     // Find or create a style element
+    let style = document.getElementById('dynamic-style-cursor');
     if (!style) {
         style = document.createElement('style');
         style.id = 'dynamic-style-cursor';
@@ -108,31 +99,13 @@ function updateCursor(cursorUrl) {
         }
     }
 
+    if(cursorUrl == "auto" ){
+        // Add new cursor rule
+        sheet.insertRule(`body { cursor: auto; }`, rules.length);
+        return;
+    }
     // Add new cursor rule
     sheet.insertRule(`body { cursor: url(${cursorUrl}), auto; }`, rules.length);
-}
-
-function updateOpacity(opacity) {
-    // Find or create a style element
-    if (!style) {
-        style = document.createElement('style');
-        style.id = 'dynamic-style-opacity';
-        document.head.appendChild(style);
-    }
-
-    // Use the CSSStyleSheet API to add or update the opacity rule
-    const sheet = style.sheet;
-    const rules = sheet.cssRules || sheet.rules;
-
-    // Remove existing opacity rules if any
-    for (let i = rules.length - 1; i >= 0; i--) {
-        if (rules[i].selectorText === 'body') {
-            sheet.deleteRule(i);
-        }
-    }
-
-    // Add new opacity rule
-    sheet.insertRule(`body { opacity: ${opacity}; }`, rules.length);
 }
 
 let selectedText = ""; // Variable to store selected text
@@ -143,8 +116,11 @@ let selectedText = ""; // Variable to store selected text
         if (cursorMod == 'normal')
             return;
 
-        if (cursorMod == 'marker')
+        if (cursorMod == 'marker'){
             selectedText = getSelectedText(window.getSelection());
+            updateSelectionColor(color);
+        }
+            
         //  clearHighlights();
 
     });

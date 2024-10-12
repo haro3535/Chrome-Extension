@@ -12,17 +12,17 @@ document.getElementById('myLink').addEventListener('click', () => {
 
 
 // For visualizing the color selection
-if (typeof colorCells === 'undefined') {
-    var colorCells = document.getElementsByClassName("colorcell");
+if (typeof colorcellhelps === 'undefined') {
+    var colorcellhelps = document.getElementsByClassName("colorcellhelp");
 }
-colorCells[0].style.borderColor = "rgb(96,165,250)";
+colorcellhelps[0].style.borderColor = "rgb(96,165,250)";
 
-for (let index = 0; index < colorCells.length; index++) {
-    colorCells[index].addEventListener("click", (event) => {
+for (let index = 0; index < colorcellhelps.length; index++) {
+    colorcellhelps[index].addEventListener("click", (event) => {
 
-        for (let j = 0; j < colorCells.length; j++) { 
-            if (colorCells[j] !== event.target) 
-                colorCells[j].style.borderColor = "";
+        for (let j = 0; j < colorcellhelps.length; j++) { 
+            if (colorcellhelps[j] !== event.target) 
+                colorcellhelps[j].style.borderColor = "";
             else event.target.style.borderColor = "rgb(96,165,250)";
         }
     })

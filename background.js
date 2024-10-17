@@ -5,6 +5,13 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 
 
+  const userData = {
+    name: 'Annonymous',
+    lastActive: new Date().toDateString(),
+    joinDate: new Date().toDateString(),
+  }
+
+
 // Gets the message from the front-end and handles the request
   chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     if (message.action === 'openSidePanel') {
@@ -17,6 +24,22 @@ chrome.runtime.onInstalled.addListener(() => {
           enabled: true
         })
       });
+    }
+    else if (message.action === "checkUserData") {
+      chrome.storage.sync.get(['userData']).then((result) => {
+        if (result.userData) {
+          sendResponse({ userData: result.userData, exists: true });
+        } else {
+          sendResponse({ exists: false });
+        }
+      });
+      return true; // Keep the message channel open for sendResponse
+    }
+    else if (message.action === "createUserData") {
+      chrome.storage.sync.set({ userData: message.userData }, () => {
+          sendResponse({ success: true });
+      });
+      return true; // Keep the message channel open for sendResponse
     }
     else if (message.action === 'changeSidePanelView') {
       chrome.sidePanel.setOptions({
@@ -49,6 +72,18 @@ chrome.runtime.onInstalled.addListener(() => {
     }
     else if (message.action === 'openLink') {
       chrome.tabs.create({ url: message.url });
+    }
+    else if (message.action === 'saveHighlights') {
+      chrome.storage.local.get({ highlights: [] }, (result) => {
+        const highlights = result.highlights;
+        message.highlights.forEach((highlight) => {
+          highlights.push(highlight);
+        });
+        chrome.storage.local.set({ highlights: highlights }, () => {
+          sendResponse({ success: true });
+        });
+      });
+      return true; // Keep the message channel open for sendResponse
     }
 
   });

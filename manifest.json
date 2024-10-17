@@ -13,7 +13,7 @@
       "default_icon": "hello_extensions.png"
     },
     "permissions": [
-      "sidePanel", "activeTab", "tabs","declarativeContent"
+      "sidePanel", "activeTab", "tabs","declarativeContent","storage"
     ],
     "side_panel": {
       "default_path": "/sidepanel/sidepanel.html"

@@ -48,6 +48,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         console.log(message.color);
         let rgbComponents = message.color.match(/\d+/g);
         color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
+        if(cursorMod == 'marker')
+            updateSelectionColor(color);
     }
   });
 
@@ -71,10 +73,11 @@ function updateSelectionColor(color) {
             sheet.deleteRule(i);
         }
     }
-
     // Add new ::selection rules
     sheet.insertRule(`::selection { background-color: ${color}; }`, rules.length);
-    sheet.insertRule(`::-moz-selection { background-color: ${color}; }`, rules.length);
+    if (navigator.userAgent.includes('Firefox')) {
+        sheet.insertRule(`::-moz-selection { background-color: ${color}; }`, rules.length + 1);
+    }
 }
 
 function updateCursor(cursorUrl) {
@@ -116,6 +119,7 @@ let selectedText = ""; // Variable to store selected text
 
         if (cursorMod == 'marker')
             selectedText = getSelectedText(window.getSelection());
+            
         //  clearHighlights();
 
     });

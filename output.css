@@ -599,6 +599,10 @@ video {
   margin-bottom: 3rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .block {
   display: block;
 }
@@ -659,6 +663,10 @@ video {
   height: 50vh;
 }
 
+.h-28 {
+  height: 7rem;
+}
+
 .w-1\/3 {
   width: 33.333333%;
 }
@@ -703,6 +711,10 @@ video {
   width: 100%;
 }
 
+.w-28 {
+  width: 7rem;
+}
+
 .max-w-3xl {
   max-width: 48rem;
 }
@@ -733,6 +745,10 @@ video {
 
 .justify-center {
   justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
 }
 
 .justify-evenly {

@@ -2,12 +2,8 @@
 // Set the year
 // document.getElementById("year").textContent = new Date().getFullYear();
 
-if (typeof opacitySpan1 === 'undefined') {
-    var opacitySpan1 = document.getElementById('opacityValueSpan');
-}
-
 document.getElementById('opacityRange').addEventListener('input', (event) => {
-    opacitySpan1.innerHTML = event.target.value / 100;
+    document.getElementById('opacityValueSpan').innerHTML = event.target.value / 100;
 })
 
 document.getElementById('opacityRange').addEventListener('change', (event) => {

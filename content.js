@@ -43,6 +43,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         alpha = message.opacityValue;
         let rgbComponents = color.match(/\d+/g);
         color = 'rgba(' + rgbComponents[0] + ', ' + rgbComponents[1] + ', ' + rgbComponents[2] + ', ' + alpha + ')';
+        if(cursorMod == 'marker')
+            updateSelectionColor(color);
     }
     else if (message.action === 'changeColor'){
         console.log(message.color);

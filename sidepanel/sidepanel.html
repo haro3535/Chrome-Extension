@@ -3,6 +3,7 @@
     <head>
         <link href="/output.css" rel="stylesheet">
         <meta charset="UTF-8">
+        <script src="/scripts/informBox.js" defer></script>
     </head>
     <body class="pb-8">
         <div class="w-full h-12 bg-slate-400 flex items-center cursor-default">
@@ -26,11 +27,15 @@
             </div>
         </div>
         
-        <div id="content" class="w-full h-full overflow-auto px-3 space-y-6 mt-6 mb-12">
+        <div id="content" class="w-full h-full overflow-auto px-3 py-2 space-y-6 mt-6 mb-12">
 
             <!-- Content will load in here -->
 
             
+        </div>
+
+        <div id="messageBox" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded shadow-lg transition-transform duration-500 ease-in-out">
+            <p id="messageText"></p>
         </div>
 
         <footer class="w-full fixed bottom-0 py-3 flex flex-col items-center bg-white  border-t-2">

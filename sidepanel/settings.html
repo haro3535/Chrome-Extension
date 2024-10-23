@@ -3,7 +3,7 @@
     <!-- Example Checkbox -->
     <div class="mb-4">
         <label class="inline-flex items-center">
-            <input id="saveHighlighting" type="checkbox" class="form-checkbox text-blue-600" checked>
+            <input id="saveHighlighting" type="checkbox" class="form-checkbox text-blue-600">
             <span class="ml-2">Save Highlightings</span>
         </label>
     </div>
@@ -28,10 +28,10 @@
 
     <!-- Radio Button Options -->
     <div class="mb-6 w-full space-y-4">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Choose the Thickness of the Heighlight</label>
-        <div class="flex justify-between w-full">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Choose the Thickness of the Highlight</label>
+        <div class="flex justify-between w-full" id="thicknessArea">
             <div class="flex items-center">
-                <input id="option1" name="options" type="radio" class="form-radio text-blue-600" checked>
+                <input id="option1" name="options" type="radio" class="form-radio text-blue-600">
                 <label for="option1" class="ml-2"><span class="highlight-span-1 text-base">Dino</span></label>
             </div>
             <div class="flex items-center">
@@ -49,4 +49,15 @@
     <div class="mb-4">
         <button id="saveSettings" type="button" class="bg-blue-600 text-white px-4 py-2 rounded-md">Save Settings</button>
     </div>
+</div>
+
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-4">Profile</h1>
+    
+    <p id="userName" class="text-sm font-medium text-gray-700 mb-2"></p>
+    <!-- Log Out Button -->
+    <div class="mb-4">
+        <button id="logOut" type="button" class="bg-red-600 text-white px-4 py-2 rounded-md">Log Out</button>
+    </div>
+    
 </div>

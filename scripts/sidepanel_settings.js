@@ -1,13 +1,21 @@
 // Define user settings preferences
 const userSettings = {
     saveHighlighting: true,
-    highlightBackgroundHeight: 20
+    lineHeightLevel: 'option1',
 };
+
+chrome.runtime.sendMessage({ action: 'checkUserData' }).then((response) => {
+    if (response.exists) {
+        document.getElementById('userName').innerText = response.userData.name;
+    } else {
+        document.getElementById('userName').innerText = 'Anonymous';
+    }
+});
 
 // Save user settings to Chrome storage
 function saveSettings() {
     chrome.storage.sync.set({ userSettings: userSettings }, function() {
-        console.log('Settings saved');
+        showMessage('Settings saved');
     });
 }
 
@@ -21,38 +29,34 @@ function getSettings() {
         } else {
             console.log('No settings found, using default settings');
         }
+        document.getElementById('saveHighlighting').checked = userSettings.saveHighlighting;
+
+        // Set the selected radio button
+        document.getElementById(userSettings.lineHeightLevel).checked = true;
     });
 }
 
-// Update the displayed value of the line height range input
-const lineHeightInput = document.getElementById('lineHeight');
-const lineHeightValue = document.getElementById('lineHeightValue');
+getSettings();
 
-lineHeightInput.addEventListener('input', function() {
-    lineHeightValue.textContent = lineHeightInput.value;
-});
-
-// Update the displayed value of the highlight background height range input
-const highlightBackgroundHeightInput = document.getElementById('highlightBackgroundHeight');
-const highlightBackgroundHeightValue = document.getElementById('highlightBackgroundHeightValue');
-const highlightPreview = document.getElementById('highlightPreview');
-
-highlightBackgroundHeightInput.addEventListener('input', function() {
-    const height = highlightBackgroundHeightInput.value;
-    highlightBackgroundHeightValue.textContent = height + 'px';
-    highlightPreview.style.height = height + 'px';
-});
-
-// Initialize settings on page load
-document.addEventListener('DOMContentLoaded', function() {
-    getSettings();
-    highlightBackgroundHeightInput.value = userSettings.highlightBackgroundHeight;
-    highlightBackgroundHeightValue.textContent = userSettings.highlightBackgroundHeight + 'px';
-    highlightPreview.style.height = userSettings.highlightBackgroundHeight + 'px';
-});
+// Get the selected radio button id
+function getSelectedRadioButtonId() {
+    const radios = document.getElementById('thicknessArea').querySelectorAll('input[type="radio"]');
+    for (let i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            return radios[i].id;
+        }
+    }
+    return 'option1';
+}
 
 
 document.getElementById('saveSettings').addEventListener('click', function() {
-    userSettings.highlightBackgroundHeight = highlightBackgroundHeightInput.value;
+    userSettings.lineHeightLevel = getSelectedRadioButtonId();
+    userSettings.saveHighlighting = document.getElementById('saveHighlighting').checked;
     saveSettings();
+});
+
+document.getElementById('logOut').addEventListener('click', function() {
+    showMessage('Log out not supported yet!');
+    // chrome.runtime.sendMessage({ action: 'logout' });
 });

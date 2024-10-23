@@ -74,7 +74,25 @@ function clickedItem(element){
     })
 }
 
+chrome.runtime.sendMessage({ action: 'getHighlightings' }, (response) => {
+    if (response && response.highlightings) {
+        response.highlightings.forEach(highlighting => {
+            // Assuming you have a function to display the highlightings
+            displayHighlighting(highlighting);
+        });
+    }
+});
 
+/**
+ * Function to display the highlighting on the side panel
+ * @param {Object} highlighting 
+ */
+function displayHighlighting(highlighting) {
+    const highlightContainer = document.createElement('div');
+    highlightContainer.className = 'highlighting';
+    highlightContainer.textContent = highlighting.text; // Adjust this based on your data structure
+    document.getElementById('highlightingsPanel').appendChild(highlightContainer);
+}
 
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){

@@ -1,5 +1,8 @@
 # Dino Marker Chrome Extension
 
+#### Video Demo: https://youtu.be/XQSkzPWTCZU
+
+
 ## Description
 
 Dino Marker is a Chrome extension designed to provide a text marker functionality. It includes a popup interface for signing in and starting the marking process, as well as a side panel for additional settings and help. This extension aims to enhance the user's browsing experience by allowing them to highlight and manage text on web pages efficiently.

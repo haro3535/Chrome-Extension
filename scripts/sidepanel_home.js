@@ -74,8 +74,8 @@ function clickedItem(element){
     })
 }
 
-chrome.runtime.sendMessage({ action: 'getHighlightings' }, (response) => {
-    if (response && response.highlightings) {
+chrome.runtime.sendMessage({ action: 'getHighlights' }, (response) => {
+    if (response && response.highlights) {
         response.highlightings.forEach(highlighting => {
             // Assuming you have a function to display the highlightings
             displayHighlighting(highlighting);

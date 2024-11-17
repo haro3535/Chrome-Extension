@@ -11,6 +11,12 @@ chrome.runtime.onInstalled.addListener(() => {
     joinDate: new Date().toDateString(),
   }
 
+  const highlight = {
+    text: 'This is a highlighted text',
+    color: 'rgb(96,165,250,0.5)',
+    date: new Date().toDateString(),
+  }
+
 
 // Gets the message from the front-end and handles the request
   chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
@@ -82,6 +88,12 @@ chrome.runtime.onInstalled.addListener(() => {
         chrome.storage.local.set({ highlights: highlights }, () => {
           sendResponse({ success: true });
         });
+      });
+      return true; // Keep the message channel open for sendResponse
+    }
+    else if (message.action === 'getHighlights') {
+      chrome.storage.local.get({ highlights: [] }, (result) => {
+        sendResponse({ highlights: result.highlights });
       });
       return true; // Keep the message channel open for sendResponse
     }

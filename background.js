@@ -97,5 +97,13 @@ chrome.runtime.onInstalled.addListener(() => {
       });
       return true; // Keep the message channel open for sendResponse
     }
+    else if (message.action === 'showMessage') {
+      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'showMessage',
+          message: message.message
+        });
+      });
+    }
 
   });

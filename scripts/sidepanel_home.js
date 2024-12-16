@@ -87,16 +87,18 @@ chrome.runtime.sendMessage({ action: 'getHighlights' }, (response) => {
  * Function to display the highlighting on the side panel
  * @param {Object} highlighting 
  */
-function displayHighlighting(highlighting) {
-    const highlightContainer = document.createElement('div');
-    highlightContainer.className = 'highlighting';
-    highlightContainer.textContent = highlighting.text; // Adjust this based on your data structure
-    document.getElementById('highlightingsPanel').appendChild(highlightContainer);
+function displayHighlighting(id, text, color) {
+    const html = `<div class="highlighting" style="background-color: ${color};">
+    <input name="${id}" value="${id} hidden">
+    ${text}
+    </div>`;
+    document.getElementById('highlightings').insertAdjacentHTML('beforeend', html);
 }
 
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
     if(message.action === "addTextCard"){
         // Buraya sidepanelde gösterilecek mesajların okunmasını ekle
+        displayHighlighting(message.id, message.text, message.color);
     }
 })

@@ -24,7 +24,7 @@
     },
     "content_scripts": [
       {
-        "js": ["content.js"],
+        "js": ["content.js", "scripts/informBox.js"],
         "css": ["marker.css"],
         "matches": ["<all_urls>"],
         "type": "module"

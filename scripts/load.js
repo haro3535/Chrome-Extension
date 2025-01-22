@@ -85,7 +85,7 @@ document.getElementById('help').addEventListener('click', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const contentElement = document.getElementById('content');
-    debugger;
+    
     function loadHTML(file) {
         return fetch(file)
             .then(response => response.text())

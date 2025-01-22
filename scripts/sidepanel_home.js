@@ -83,10 +83,7 @@ chrome.runtime.sendMessage({ action: 'getHighlights' }, (response) => {
     }
 });
 
-/**
- * Function to display the highlighting on the side panel
- * @param {Object} highlighting 
- */
+
 function displayHighlighting(id, text, color) {
     const html = `<div class="highlighting" style="background-color: ${color};">
     <input name="${id}" value="${id} hidden">

@@ -385,14 +385,18 @@ let selectedText = ""; // Variable to store selected text
         }
         else if (direction == 'p'){
             // Burada previous sibling null ise sıkıntı çıkmasın diye yapıyorum
-            if (node.previousSibling != null && node.previousSibling != undefined){
-                let prevSibling = node.previousSibling;
-                if(node != startEnd)
-                    traversRootFromTopToBottom(prevSibling);
-                horizontalStepFunction(prevSibling, targetNode, direction, null);
+            try {
+                if (node.previousSibling != null && node.previousSibling != undefined){
+                    let prevSibling = node.previousSibling;
+                    if(node != startEnd)
+                        traversRootFromTopToBottom(prevSibling);
+                    horizontalStepFunction(prevSibling, targetNode, direction, null);
+                }
+                else 
+                    horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, startEnd);
+            } catch (error) {
+                
             }
-            else 
-                horizontalStepFunction(findUpperParentWhichIsHaveNotNullSibling(node.parentElement, targetNode, direction), targetNode, direction, startEnd);
         }
         else 
         {
